@@ -83,7 +83,7 @@ function calcNet(cid, gross) {
         [280000, 320000, 0.20], [320000, 500000, 0.22],
         [500000, 1000000, 0.23], [1000000, Infinity, 0.24],
       ]);
-      social = Math.min(gross, 102000) * 0.20; // CPF OW cap ~$102K/yr
+      social = Math.min(gross, 88800) * 0.20; // CPF OW cap SGD 7,400/mo × 12 (2025)
       break;
     }
     case "hk": {

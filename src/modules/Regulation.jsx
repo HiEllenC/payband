@@ -34,11 +34,13 @@ export default function Regulation({ lang, t }) {
     if (regView !== "ai") return;
     (async () => {
       try {
-        const cached = await window.storage.get("reg-articles-v2");
-        if (cached) {
-          const data = JSON.parse(cached.value);
-          setArticles(data);
-          if (data.some(a => a.date === todayStr)) return;
+        const raw = localStorage.getItem("reg-articles-v2");
+        if (raw) {
+          const data = JSON.parse(raw);
+          if (Array.isArray(data)) {
+            setArticles(data);
+            if (data.some(a => a.date === todayStr)) return;
+          }
         }
       } catch (e) {}
       await generateDailyArticles();
@@ -65,14 +67,11 @@ export default function Regulation({ lang, t }) {
 
       for (const [cat, prompt] of [["crypto", cryptoPrompt], ["hr", hrPrompt]]) {
         try {
-          const res = await fetch("https://api.anthropic.com/v1/messages", {
+          const res = await fetch("/api/ai-news", {
             method: "POST", headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({
-              model: "claude-sonnet-4-20250514", max_tokens: 800,
-              messages: [{ role: "user", content: prompt }],
-              tools: [{ type: "web_search_20250305", name: "web_search" }]
-            })
+            body: JSON.stringify({ prompt, lang })
           });
+          if (!res.ok) throw new Error(`API error ${res.status}`);
           const data = await res.json();
           const text = (data.content || []).filter(b => b.type === "text").map(b => b.text).join("\n");
           const firstLine = text.split("\n").find(l => l.trim());
@@ -91,7 +90,7 @@ export default function Regulation({ lang, t }) {
       }
     }
     setArticles(newArticles);
-    try { await window.storage.set("reg-articles-v2", JSON.stringify(newArticles)); } catch (e) {}
+    try { localStorage.setItem("reg-articles-v2", JSON.stringify(newArticles)); } catch (e) {}
     setAiLoading(false);
   };
 
@@ -271,8 +270,9 @@ export default function Regulation({ lang, t }) {
                 <div style={{ fontSize: 28, marginBottom: 8 }}>📡</div>
                 <div style={{ fontSize: 15, fontWeight: 600, color: D.tx }}>{t("Generating today's briefings...", "正在生成今日簡報...")}</div>
                 <div style={{ fontSize: 13, color: D.tx3, marginTop: 4 }}>{t("AI is searching the web and writing articles for 6 countries × 2 categories", "AI正在搜尋並撰寫6國×2類別的文章")}</div>
+                <style>{`@keyframes pb-slide{0%{transform:translateX(-100%)}100%{transform:translateX(350%)}}`}</style>
                 <div style={{ width: 200, height: 4, background: D.lnF, borderRadius: 4, margin: "16px auto 0", overflow: "hidden" }}>
-                  <div style={{ width: "60%", height: "100%", background: D.sage, borderRadius: 4 }} />
+                  <div style={{ width: "30%", height: "100%", background: D.sage, borderRadius: 4, animation: "pb-slide 1.4s ease-in-out infinite" }} />
                 </div>
               </div>
             </Card>

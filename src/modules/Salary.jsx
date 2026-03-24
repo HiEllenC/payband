@@ -13,7 +13,7 @@ const D = {
 const bC = [D.slate, D.sage, D.copper, D.clay, D.wine, "#6b6b8a"];
 
 // Redesigned cell: P50 large, band bar below, P25/P75 labels clear
-function BandCell({ band, actual, color, usdt, lvlId }) {
+function BandCell({ band, actual, color, usdt, lvlId, lang }) {
   const cr = actual ? compaRatio(actual, band.p50) : null;
   const crColor = cr == null ? "#a8a8b4" : cr < 85 ? "#c0392b" : cr > 115 ? "#27ae60" : "#e67e22";
   // bar positioning: 0% = band.p25, 100% = band.p75
@@ -64,7 +64,7 @@ function BandCell({ band, actual, color, usdt, lvlId }) {
       {/* Compa-ratio */}
       {cr != null && (
         <div style={{ marginTop: 5, fontSize: 10, fontFamily: "'DM Mono',monospace", color: crColor, fontWeight: 600 }}>
-          CR {cr}% {cr < 85 ? "⚠ low" : cr > 115 ? "✓ high" : "✓ mid"}
+          CR {cr}% {cr < 85 ? (lang === "zh" ? "⚠ 偏低" : "⚠ low") : cr > 115 ? (lang === "zh" ? "✓ 偏高" : "✓ high") : (lang === "zh" ? "✓ 適中" : "✓ mid")}
         </div>
       )}
     </div>
@@ -145,11 +145,13 @@ export default function Salary({ selC, togC, selFam, setSelFam, selSub, setSelSu
             }}
           />
           {actual > 0 && (() => {
-            const cr85 = actual < 85 * 0.85;
-            const cr115 = actual > 85 * 1.15;
+            const refId = sel[0]?.id || "us";
+            const refBand = gBand(refId, selFam, selSub, track, selLvl);
+            const belowFloor = actual < refBand.p25;
+            const aboveTop = actual > refBand.p75;
             return (
-              <div style={{ fontSize: 12, padding: "5px 12px", borderRadius: 6, background: cr85 ? "#fdecea" : cr115 ? "#eafaf1" : "#fef9e7", color: cr85 ? "#c0392b" : cr115 ? "#27ae60" : "#e67e22", fontFamily: "'DM Mono',monospace" }}>
-                {cr85 ? t("⚠ Below market floor (P25)","⚠ 低於市場下限 P25") : cr115 ? t("✓ Above market top (P75)","✓ 超過市場頂端 P75") : t("✓ Within market band","✓ 落在市場帶寬內")}
+              <div style={{ fontSize: 12, padding: "5px 12px", borderRadius: 6, background: belowFloor ? "#fdecea" : aboveTop ? "#eafaf1" : "#fef9e7", color: belowFloor ? "#c0392b" : aboveTop ? "#27ae60" : "#e67e22", fontFamily: "'DM Mono',monospace" }}>
+                {belowFloor ? t("⚠ Below market floor (P25)","⚠ 低於市場下限 P25") : aboveTop ? t("✓ Above market top (P75)","✓ 超過市場頂端 P75") : t("✓ Within market band","✓ 落在市場帶寬內")}
               </div>
             );
           })()}
@@ -178,7 +180,7 @@ export default function Salary({ selC, togC, selFam, setSelFam, selSub, setSelSu
               <div style={{ display: "grid", gridTemplateColumns: `repeat(${lvls.length}, 1fr)`, gap: 8 }}>
                 {lvls.map((l, li) => {
                   const band = gBand(c.id, selFam, selSub, track, li);
-                  return <BandCell key={l.id} band={band} actual={actual} color={bC[ci]} usdt={usdt} lvlId={l.id.toUpperCase()} />;
+                  return <BandCell key={l.id} band={band} actual={actual} color={bC[ci]} usdt={usdt} lvlId={l.id.toUpperCase()} lang={lang} />;
                 })}
               </div>
             ) : (
@@ -191,7 +193,7 @@ export default function Salary({ selC, togC, selFam, setSelFam, selSub, setSelSu
                       <div style={{ fontSize: 10, fontWeight: 600, color: `${bC[ci]}aa`, fontFamily: "'DM Mono',monospace", letterSpacing: 1.5, marginBottom: 4 }}>{l.id.toUpperCase()}</div>
                       <div style={{ fontSize: 20, fontWeight: 700, fontFamily: "'DM Mono',monospace", color: bC[ci], marginBottom: 6 }}>{fmt(v, usdt)}</div>
                       <div style={{ height: 6, borderRadius: 3, background: "rgba(0,0,0,0.06)", overflow: "hidden" }}>
-                        <div style={{ width: `${(v / (mx * 1.08)) * 100}%`, height: "100%", background: bC[ci], opacity: 0.45, borderRadius: 3, transition: "width 0.6s" }} />
+                        <div style={{ width: `${mx > 0 ? (v / (mx * 1.08)) * 100 : 0}%`, height: "100%", background: bC[ci], opacity: 0.45, borderRadius: 3, transition: "width 0.6s" }} />
                       </div>
                     </div>
                   );

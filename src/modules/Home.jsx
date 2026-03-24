@@ -28,7 +28,7 @@ export default function Home({ selC, togC, setTab, ready, t }) {
       {/* Hero section with map */}
       <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 40, padding: "48px 0 40px", alignItems: "center" }}>
         <div style={{ opacity: ready ? 1 : 0, transform: ready ? "translateX(0)" : "translateX(-20px)", transition: "all 0.8s cubic-bezier(.22,1,.36,1)" }}>
-          <Tag color={D.copper}>Cross-Border Compensation Intelligence</Tag>
+          <Tag color={D.copper}>{t("Cross-Border Compensation Intelligence", "跨境薪酬情報平台")}</Tag>
           <h1 style={{ fontSize: 42, fontWeight: 400, color: D.tx, lineHeight: 1.25, fontFamily: "'DM Mono','Noto Sans TC',monospace", marginTop: 16, letterSpacing: -0.5 }}>
             {t("Global crypto", "跨國加密貨幣")}<br />
             {t("compensation,", "薪酬情報，")}<br />

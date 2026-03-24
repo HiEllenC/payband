@@ -337,7 +337,7 @@ function fmtTime(ts) {
 }
 
 // ─── Spinner ────────────────────────────────────────────────────────────────
-const Spinner = () => (
+const Spinner = ({ lang }) => (
   <div style={{ display: "flex", alignItems: "center", justifyContent: "center", padding: "40px 0", gap: 8 }}>
     <div style={{
       width: 16, height: 16, border: `2px solid ${D.ln}`,
@@ -345,16 +345,16 @@ const Spinner = () => (
       animation: "spin 0.8s linear infinite",
     }} />
     <style>{`@keyframes spin{to{transform:rotate(360deg)}}`}</style>
-    <span style={{ fontSize: 13, color: D.tx4, fontFamily: FONT }}>Loading live data…</span>
+    <span style={{ fontSize: 13, color: D.tx4, fontFamily: FONT }}>{lang === "zh" ? "載入即時數據中…" : "Loading live data…"}</span>
   </div>
 );
 
 // ─── Live badge ─────────────────────────────────────────────────────────────
-const LiveBadge = ({ status, timeStr }) => {
+const LiveBadge = ({ status, timeStr, lang }) => {
   const cfg = {
-    live:   { dot: D.sage,  text: D.sage,  label: `LIVE · ${timeStr}` },
-    cached: { dot: D.copper, text: D.copper, label: `CACHED · ${timeStr}` },
-    static: { dot: D.tx4,   text: D.tx4,   label: "STATIC DATA" },
+    live:   { dot: D.sage,  text: D.sage,  label: lang === "zh" ? `即時 · ${timeStr}` : `LIVE · ${timeStr}` },
+    cached: { dot: D.copper, text: D.copper, label: lang === "zh" ? `快取 · ${timeStr}` : `CACHED · ${timeStr}` },
+    static: { dot: D.tx4,   text: D.tx4,   label: lang === "zh" ? "靜態數據" : "STATIC DATA" },
   }[status] ?? { dot: D.tx4, text: D.tx4, label: "—" };
   return (
     <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
@@ -509,14 +509,14 @@ export default function Markets({ lang, t, usdt }) {
                 <span style={{ fontSize: 15, fontWeight: 600, color: D.tx, fontFamily: FONT }}>
                   {t("Global Crypto Markets", "全球加密貨幣市場")}
                 </span>
-                <LiveBadge status={cryptoStatus} timeStr={cryptoTimeStr} />
+                <LiveBadge status={cryptoStatus} timeStr={cryptoTimeStr} lang={lang} />
               </div>
               <span style={{ fontSize: 11, color: D.tx4, fontFamily: FONT }}>
                 {t("Prices in USD · Volume in USD billions", "價格單位：美元 · 交易量單位：十億美元")}
               </span>
             </div>
 
-            {cryptoLoading ? <Spinner /> : (
+            {cryptoLoading ? <Spinner lang={lang} /> : (
             <div style={{ overflowX: "auto" }}>
               <table style={{ width: "100%", borderCollapse: "collapse" }}>
                 <thead>
@@ -621,7 +621,7 @@ export default function Markets({ lang, t, usdt }) {
                     {usdt ? "USDT" : "USD"}
                   </span>
                 </div>
-                <LiveBadge status={fxStatus} timeStr={fxTimeStr} />
+                <LiveBadge status={fxStatus} timeStr={fxTimeStr} lang={lang} />
               </div>
               <span style={{ fontSize: 11, color: D.tx4, fontFamily: FONT }}>
                 {fxStatus === "live"
@@ -630,7 +630,7 @@ export default function Markets({ lang, t, usdt }) {
               </span>
             </div>
 
-            {fxLoading ? <Spinner /> : (
+            {fxLoading ? <Spinner lang={lang} /> : (
             <div style={{ overflowX: "auto" }}>
               <table style={{ width: "100%", borderCollapse: "collapse" }}>
                 <thead>
