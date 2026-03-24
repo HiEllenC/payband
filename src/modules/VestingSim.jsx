@@ -25,23 +25,33 @@ const TOKEN_TAX = {
   my: { rate: 0.30, zh: "ESOS：行使價值超過參考價部分為薪資所得。無資本利得稅。加密貨幣：無正式指引，可能按收入課稅。", en: "ESOS: excess of exercise value over reference price is employment income. No CGT. Crypto: no formal guidance, likely income." },
 };
 
-function calcVesting(grant, cliffYrs, totalYrs) {
-  // All amounts in USD. Returns array of { yr, vested, cumulative }
-  const perYear = grant / totalYrs;
+function calcVesting(grant, cliffYrs, totalYrs, freq) {
+  // All amounts in USD. Returns array of { period, yr, vested, cumulative, label, isCliff }
+  const periodsPerYear = freq === "monthly" ? 12 : freq === "quarterly" ? 4 : 1;
+  const totalPeriods = totalYrs * periodsPerYear;
+  const cliffPeriod = cliffYrs * periodsPerYear;
+  const perPeriod = grant / totalPeriods;
   const result = [];
   let cumulative = 0;
 
-  for (let yr = 1; yr <= totalYrs; yr++) {
+  for (let p = 1; p <= totalPeriods; p++) {
     let vested = 0;
-    if (cliffYrs > 0 && yr < cliffYrs) {
+    if (cliffPeriod > 0 && p < cliffPeriod) {
       vested = 0;
-    } else if (cliffYrs > 0 && yr === cliffYrs) {
-      vested = perYear * cliffYrs; // all accumulated at cliff
+    } else if (cliffPeriod > 0 && p === cliffPeriod) {
+      vested = perPeriod * cliffPeriod; // all accumulated at cliff
     } else {
-      vested = perYear;
+      vested = perPeriod;
     }
     cumulative += vested;
-    result.push({ yr, vested, cumulative });
+    const yr = Math.ceil(p / periodsPerYear);
+    const pInYr = ((p - 1) % periodsPerYear) + 1;
+    const label = freq === "quarterly"
+      ? `Q${pInYr} · Y${yr}`
+      : freq === "monthly"
+        ? `M${String(pInYr).padStart(2, "0")} · Y${yr}`
+        : `Year ${yr}`;
+    result.push({ period: p, yr, vested, cumulative, label, isCliff: cliffPeriod > 0 && p === cliffPeriod });
   }
   return result;
 }
@@ -67,8 +77,8 @@ export default function VestingSim({ usdt, lang, t }) {
   const [priceChg, setPriceChg] = useState(0);
 
   const vestData = useMemo(() =>
-    calcVesting(grant, cliffYrs, totalYrs),
-    [grant, cliffYrs, totalYrs]
+    calcVesting(grant, cliffYrs, totalYrs, freq),
+    [grant, cliffYrs, totalYrs, freq]
   );
 
   const scenarios = [
@@ -208,10 +218,10 @@ export default function VestingSim({ usdt, lang, t }) {
           </div>
 
           {vestData.map((d) => (
-            <div key={d.yr} style={{ marginBottom: 16 }}>
+            <div key={d.period} style={{ marginBottom: 16 }}>
               <div style={{ fontSize: 12, color: D.tx3, marginBottom: 4, fontFamily: "'DM Mono',monospace" }}>
-                {t("Year","第")}{d.yr}{lang === "zh" ? "年" : ""}
-                {cliffYrs > 0 && d.yr === cliffYrs && (
+                {d.label}
+                {d.isCliff && (
                   <span style={{ marginLeft: 8, fontSize: 10, padding: "1px 6px", borderRadius: 3, background: D.copper + "20", color: D.copper }}>
                     CLIFF
                   </span>
@@ -272,10 +282,10 @@ export default function VestingSim({ usdt, lang, t }) {
             </thead>
             <tbody>
               {vestData.map((d) => (
-                <tr key={d.yr} style={{ borderTop: `1px solid ${D.lnF}` }}>
+                <tr key={d.period} style={{ borderTop: `1px solid ${D.lnF}` }}>
                   <td style={{ padding: "10px 16px", fontSize: 13, color: D.tx, fontFamily: "'DM Mono',monospace" }}>
-                    {t("Year","第")}{d.yr}{lang === "zh" ? "年" : ""}
-                    {cliffYrs > 0 && d.yr === cliffYrs && (
+                    {d.label}
+                    {d.isCliff && (
                       <span style={{ marginLeft: 6, fontSize: 10, padding: "1px 6px", borderRadius: 3, background: D.copper + "20", color: D.copper }}>
                         CLIFF
                       </span>

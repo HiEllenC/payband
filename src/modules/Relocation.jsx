@@ -243,7 +243,7 @@ export default function Relocation({ lang, t }) {
                     background: D.surface, color: D.tx, fontSize: 12,
                     fontFamily: "'DM Mono','Noto Sans TC',monospace",
                   }}>
-                    {subs.map(s => <option key={s.id} value={s.id}>{t(s.id.toUpperCase(), s.zh || s.id)}</option>)}
+                    {subs.map(s => <option key={s.id} value={s.id}>{t(s.l || s.id, s.zh || s.id)}</option>)}
                   </select>
                 </div>
                 <div>

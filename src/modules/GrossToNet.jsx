@@ -127,7 +127,7 @@ function calcNet(cid, gross) {
         [0, 19000, 0.05], [19000, 54000, 0.12], [54000, 109000, 0.20],
         [109000, 205000, 0.30], [205000, Infinity, 0.40],
       ]);
-      social = gross * 0.1276; // labor ins 1.59% + health ~5.17% + pension 6%
+      social = gross * 0.0676; // labor ins 1.59% + health ~5.17% (pension 6% is employer contribution, not EE)
       break;
     }
     case "ph": {
