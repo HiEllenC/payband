@@ -75,11 +75,28 @@ export default function LaborLaw({ selC, togC, lang, t }) {
   return (
     <div>
       <div style={{ fontSize: 28, fontWeight: 500, color: D.tx, fontFamily: "'DM Mono','Noto Sans TC',monospace", marginBottom: 6 }}>
-        {t("Labor Law Comparison", "勞動法規對比")}
+        {t("Labor Law Comparison Matrix", "勞動法規比較矩陣")}
       </div>
-      <div style={{ fontSize: 14, color: D.tx3, marginBottom: 20 }}>
-        {t("20 categories across 5 dimensions", "5大維度共20項類別")}
+      <div style={{ fontSize: 14, color: D.tx3, marginBottom: 14 }}>
+        {t("12 countries × 20 categories across 5 dimensions — leave entitlements, employment terms, working conditions, social security & termination protections", "12國 × 5大維度 × 20項類別——休假、僱傭條款、工作條件、社保退休與解僱保護")}
       </div>
+
+      {/* Dimension guide */}
+      <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(190px,1fr))", gap: 8, marginBottom: 16 }}>
+        {[
+          { icon: "🏖️", title: t("Leave Entitlements","休假權益（7項）"),     desc: t("Annual leave, public holidays, maternity, paternity, sick leave, marriage, bereavement","年假・國假・產假・陪產・病假・婚假・喪假") },
+          { icon: "📝", title: t("Employment Terms","僱傭條款（4項）"),       desc: t("Probation, notice period, 13th month pay, overtime premium","試用期・預告期・第13個月薪・加班費率") },
+          { icon: "⚙️", title: t("Working Conditions","工作條件（3項）"),     desc: t("Weekly hours cap, minimum wage, business visa entitlement","每週工時上限・最低工資・商務假") },
+          { icon: "🛡️", title: t("Social Security","社保與退休（3項）"),      desc: t("Employer & employee social contribution rates, pension scheme type","雇主/員工提撥比率・退休金制度類型") },
+          { icon: "⚖️", title: t("Termination","解僱保護（2項）"),            desc: t("Severance formula, unfair dismissal protection strength","資遣費計算公式・不當解僱保護力度") },
+        ].map(({ icon, title, desc }) => (
+          <div key={title} style={{ padding: "10px 14px", borderRadius: 8, background: "rgba(0,0,0,0.02)", border: "1px solid rgba(0,0,0,0.05)" }}>
+            <div style={{ fontSize: 15, marginBottom: 4 }}>{icon} <span style={{ fontSize: 12, fontWeight: 600, color: D.ink, fontFamily: "'DM Mono','Noto Sans TC',monospace" }}>{title}</span></div>
+            <div style={{ fontSize: 11, color: D.tx3, lineHeight: 1.55 }}>{desc}</div>
+          </div>
+        ))}
+      </div>
+
       <WorldMap selected={selC} onSelect={togC} t={t} />
       <Card glow style={{ marginTop: 12 }}>
         <div style={{ overflowX: "auto" }}>

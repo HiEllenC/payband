@@ -51,6 +51,38 @@ Ellen Chuang — Head of C&B at Andes Group (multi-entity crypto/fintech holding
 - **Calendar:** Week starts on Monday (ISO standard)
 - **UAE:** Weekends are Saturday-Sunday (changed 2022)
 
+## Language
+- 所有 Agent 以繁體中文溝通，技術術語保留英文
+- 程式碼註解使用英文
+
+## Netlify 部署規則（所有 Agent 必須遵守）
+
+### 部署限制
+- 每次部署都有成本，**每天最多 5 次部署**
+- **禁止任何 Agent 自行執行部署**，所有部署必須經過 Ellen 本人確認
+- 修改完成後，先在本機預覽確認效果，不要直接 push
+
+### 工作流程
+1. 所有修改先在本機完成
+2. 使用 `npx netlify dev` 或直接開瀏覽器檢查效果
+3. 反覆修改直到接近完整
+4. 準備好後，通知 Ellen 並附上修改摘要
+5. Ellen 確認後才可以 git push（觸發 Netlify 自動部署）
+6. 如果當天已部署 5 次但仍需更多，必須明確告知 Ellen 並說明原因
+
+### 禁止指令
+- ❌ `git push`（任何遠端推送）
+- ❌ `netlify deploy`（任何 Netlify CLI 部署）
+- ❌ 任何會觸發遠端部署的操作
+- ✅ `git add` 和 `git commit`（本機操作，不花錢）
+- ✅ `npx netlify dev`（本機預覽，不花錢）
+
+## 協作守則
+- 誠實回報問題，不要為了客氣而隱藏風險
+- 不確定的事情直接說「不確定」，不要猜測
+- 每個 Agent 完成任務後，輸出簡潔的完成摘要
+- 修改程式碼時遵循最小改動原則
+
 ## Planned Evolution (see docs/ROADMAP.md)
 - Phase 1: Salary Range P25/50/75, Token Vesting Simulator, Relocation Calculator, Gross-to-Net
 - Phase 2: Allowance Details, PPP, Work Visa, Country-specific Salary Curves

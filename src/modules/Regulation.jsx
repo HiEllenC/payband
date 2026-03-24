@@ -115,8 +115,23 @@ export default function Regulation({ lang, t }) {
       <div style={{ fontSize: 28, fontWeight: 500, color: D.tx, fontFamily: "'DM Mono','Noto Sans TC',monospace", marginBottom: 6 }}>
         {t("Crypto Regulation Intelligence", "加密貨幣法規情報")}
       </div>
-      <div style={{ fontSize: 14, color: D.tx3, marginBottom: 20 }}>
+      <div style={{ fontSize: 14, color: D.tx3, marginBottom: 14 }}>
         {t("Timeline, regulatory framework analysis, and AI-powered real-time monitoring", "時間軸、監管框架分析與AI即時監控")}
+      </div>
+
+      {/* Mode guide */}
+      <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(200px,1fr))", gap: 8, marginBottom: 16 }}>
+        {[
+          { icon: "⏱️", title: t("Timeline","法規時間軸"),        desc: t("20 regulatory events 2018–2026, tagged NEW / AMENDED / REVOKED / PROPOSED. Filter by country or impact level.","2018–2026年20條法規事件，標記新增/修正/廢止/草案，可依國家或影響程度篩選。") },
+          { icon: "🗂️", title: t("Framework Matrix","監管框架矩陣"), desc: t("12 countries × 6 dimensions: regulator, license type, tax treatment, stablecoin, DeFi, custody rules.","12國×6維度：監管機構・牌照類型・稅務・穩定幣・DeFi・託管規則並列對比。") },
+          { icon: "🤖", title: t("AI Daily News","AI法規日報"),    desc: t("Claude AI + web search generates daily briefings: Crypto Regulation + HR & Labor news per selected language.","Claude AI＋網路搜尋每日自動生成：幣圈法規 + 勞動法規兩大類別新聞。") },
+          { icon: "🚦", title: t("Regulatory Status","監管狀態"),   desc: t("Regulated = clear licensing framework. Evolving = active legislation in progress. Affects employer compliance burden.","Regulated=明確牌照框架；Evolving=法規制定中。影響雇主合規義務與營運風險。") },
+        ].map(({ icon, title, desc }) => (
+          <div key={title} style={{ padding: "10px 14px", borderRadius: 8, background: "rgba(0,0,0,0.02)", border: "1px solid rgba(0,0,0,0.05)" }}>
+            <div style={{ fontSize: 15, marginBottom: 4 }}>{icon} <span style={{ fontSize: 12, fontWeight: 600, color: "#2d3142", fontFamily: "'DM Mono','Noto Sans TC',monospace" }}>{title}</span></div>
+            <div style={{ fontSize: 11, color: "#7d7d88", lineHeight: 1.55 }}>{desc}</div>
+          </div>
+        ))}
       </div>
 
       {/* Stats */}

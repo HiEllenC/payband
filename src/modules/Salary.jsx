@@ -12,53 +12,59 @@ const D = {
 };
 const bC = [D.slate, D.sage, D.copper, D.clay, D.wine, "#6b6b8a"];
 
-function RangeBar({ band, actual, color, usdt }) {
-  const max = band.p75 * 1.15;
-  const pct = v => `${Math.min((v / max) * 100, 100)}%`;
+// Redesigned cell: P50 large, band bar below, P25/P75 labels clear
+function BandCell({ band, actual, color, usdt, lvlId }) {
   const cr = actual ? compaRatio(actual, band.p50) : null;
-  const crColor = cr == null ? D.tx4 : cr < 85 ? "#c0392b" : cr > 115 ? "#27ae60" : "#e67e22";
+  const crColor = cr == null ? "#a8a8b4" : cr < 85 ? "#c0392b" : cr > 115 ? "#27ae60" : "#e67e22";
+  // bar positioning: 0% = band.p25, 100% = band.p75
+  const barMax = band.p75 * 1.08;
+  const pPct = v => `${Math.min((v / barMax) * 100, 100)}%`;
+  const p25pct = pPct(band.p25);
+  const p50pct = pPct(band.p50);
+  const p75pct = pPct(band.p75);
+  const actPct = actual > 0 ? pPct(actual) : null;
 
   return (
-    <div style={{ marginBottom: 6 }}>
+    <div style={{ padding: "10px 12px", borderRadius: 8, background: `${color}06`, border: `1px solid ${color}18`, minWidth: 0 }}>
+      {/* Level tag */}
+      <div style={{ fontSize: 10, fontWeight: 600, color: `${color}aa`, fontFamily: "'DM Mono',monospace", letterSpacing: 1.5, marginBottom: 4, textTransform: "uppercase" }}>
+        {lvlId}
+      </div>
+      {/* P50 — prominent */}
+      <div style={{ fontSize: 20, fontWeight: 700, fontFamily: "'DM Mono',monospace", color, lineHeight: 1, marginBottom: 6 }}>
+        {fmt(band.p50, usdt)}
+      </div>
       {/* Range bar */}
-      <div style={{ position: "relative", height: 28, borderRadius: 6, background: "#f0f0f4", overflow: "visible" }}>
-        {/* P25–P75 band */}
+      <div style={{ position: "relative", height: 8, borderRadius: 4, background: "rgba(0,0,0,0.06)", marginBottom: 5 }}>
+        {/* P25–P75 filled band */}
         <div style={{
-          position: "absolute", left: pct(band.p25), width: `calc(${pct(band.p75)} - ${pct(band.p25)})`,
-          height: "100%", background: `${color}28`, borderRadius: 4,
+          position: "absolute",
+          left: p25pct, right: `${100 - parseFloat(p75pct)}%`,
+          height: "100%", background: color, opacity: 0.3, borderRadius: 4,
         }} />
-        {/* P50 marker */}
+        {/* P50 tick */}
         <div style={{
-          position: "absolute", left: pct(band.p50), transform: "translateX(-50%)",
-          width: 2, height: "100%", background: color, opacity: 0.7,
+          position: "absolute", left: p50pct, transform: "translateX(-50%)",
+          width: 3, height: "100%", background: color, opacity: 0.85, borderRadius: 2,
         }} />
-        {/* Actual salary marker */}
-        {actual > 0 && (
+        {/* Actual dot */}
+        {actPct && (
           <div style={{
-            position: "absolute", left: pct(actual), transform: "translateX(-50%)",
-            width: 10, height: 10, borderRadius: "50%", background: crColor,
-            top: "50%", marginTop: -5, boxShadow: `0 0 0 2px white`,
+            position: "absolute", left: actPct, transform: "translate(-50%,-25%)",
+            width: 12, height: 12, borderRadius: "50%", background: crColor,
+            boxShadow: "0 0 0 2px #fff, 0 0 0 3px " + crColor + "60",
           }} />
         )}
-        {/* P50 label */}
-        <span style={{
-          position: "absolute", left: 8, top: "50%", transform: "translateY(-50%)",
-          fontSize: 12, fontWeight: 500, fontFamily: "'DM Mono',monospace", color,
-        }}>
-          {fmt(band.p50, usdt)}
-        </span>
-        {/* Band range label */}
-        <span style={{
-          position: "absolute", right: 8, top: "50%", transform: "translateY(-50%)",
-          fontSize: 10, color: D.tx4, fontFamily: "'DM Mono',monospace",
-        }}>
-          {fmt(band.p25, usdt)}–{fmt(band.p75, usdt)}
-        </span>
+      </div>
+      {/* P25 / P75 labels */}
+      <div style={{ display: "flex", justifyContent: "space-between", fontSize: 10, color: "#a8a8b4", fontFamily: "'DM Mono',monospace" }}>
+        <span>{fmt(band.p25, usdt)}</span>
+        <span>{fmt(band.p75, usdt)}</span>
       </div>
       {/* Compa-ratio */}
       {cr != null && (
-        <div style={{ fontSize: 11, color: crColor, fontFamily: "'DM Mono',monospace", marginTop: 3, textAlign: "right" }}>
-          Compa-Ratio: {cr}%
+        <div style={{ marginTop: 5, fontSize: 10, fontFamily: "'DM Mono',monospace", color: crColor, fontWeight: 600 }}>
+          CR {cr}% {cr < 85 ? "⚠ low" : cr > 115 ? "✓ high" : "✓ mid"}
         </div>
       )}
     </div>
@@ -76,7 +82,7 @@ export default function Salary({ selC, togC, selFam, setSelFam, selSub, setSelSu
     <div>
       <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 20 }}>
         <div style={{ fontSize: 28, fontWeight: 500, color: D.tx, fontFamily: "'DM Mono','Noto Sans TC',monospace" }}>
-          {t("Salary Matrix", "薪資矩陣")}
+          {t("Salary Band Matrix", "薪資帶寬矩陣")}
         </div>
         <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
           <button onClick={() => setShowBand(b => !b)} style={{
@@ -97,105 +103,225 @@ export default function Salary({ selC, togC, selFam, setSelFam, selSub, setSelSu
         lang={lang} t={t}
       />
 
+      {/* How to read this */}
+      <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(200px,1fr))", gap: 8, marginBottom: 12 }}>
+        {[
+          { tag: "P25", color: "#aaa",    title: t("Market Floor","市場下限"),    desc: t("Entry / lower bound — new hires, junior candidates","新人招募基準，低於此需說明理由") },
+          { tag: "P50", color: D.slate,   title: t("Market Midpoint","市場中位"), desc: t("Standard offer target — aligned with industry median","標準 Offer 水位，符合同業中位數") },
+          { tag: "P75", color: D.sage,    title: t("Top of Band","帶頂留才"),      desc: t("Retention / compete for talent — senior or scarce roles","留才/搶才水位，用於稀缺職位") },
+          { tag: "CR",  color: D.copper,  title: t("Compa-Ratio","薪資比值"),      desc: t("Your salary ÷ P50 × 100 — 100% = market mid; <85% undermarket","你的薪資 ÷ P50 × 100，100%=市場中位；<85%偏低") },
+        ].map(({ tag, color, title, desc }) => (
+          <div key={tag} style={{ padding: "10px 14px", borderRadius: 8, background: "rgba(0,0,0,0.02)", border: "1px solid rgba(0,0,0,0.05)", display: "flex", gap: 10, alignItems: "flex-start" }}>
+            <div style={{ minWidth: 32, height: 22, borderRadius: 4, background: color + "20", display: "flex", alignItems: "center", justifyContent: "center" }}>
+              <span style={{ fontSize: 10, fontWeight: 700, fontFamily: "'DM Mono',monospace", color }}>{tag}</span>
+            </div>
+            <div>
+              <div style={{ fontSize: 12, fontWeight: 600, color: D.tx, fontFamily: "'DM Mono','Noto Sans TC',monospace", marginBottom: 2 }}>{title}</div>
+              <div style={{ fontSize: 11, color: "#7d7d88", lineHeight: 1.5 }}>{desc}</div>
+            </div>
+          </div>
+        ))}
+      </div>
+
       {/* Compa-Ratio Input */}
       <Card style={{ marginBottom: 12, padding: "14px 18px" }}>
         <div style={{ display: "flex", alignItems: "center", gap: 12, flexWrap: "wrap" }}>
-          <span style={{ fontSize: 13, color: D.tx2, fontFamily: "'DM Mono',monospace" }}>
-            {t("My Salary (USD K):", "我的薪資（千美元）：")}
-          </span>
+          <div>
+            <div style={{ fontSize: 11, color: "#a8a8b4", marginBottom: 4, fontFamily: "'DM Mono',monospace" }}>
+              {t("COMPA-RATIO CHECK", "薪資比值檢驗")}
+            </div>
+            <div style={{ fontSize: 12, color: "#4a4a52" }}>
+              {t("Enter an actual salary to see where it falls in the band", "輸入實際薪資，查看在帶寬中的位置與市場競爭力")}
+            </div>
+          </div>
           <input
             type="number"
             value={actualSalary}
             onChange={e => setActualSalary(e.target.value)}
-            placeholder={t("e.g. 85", "例如 85")}
+            placeholder={t("e.g. 85 (USD K)", "例如 85（千美元）")}
             style={{
-              width: 110, padding: "6px 12px", borderRadius: 6, border: `1px solid #ddd`,
+              width: 160, padding: "6px 12px", borderRadius: 6, border: `1px solid #ddd`,
               fontSize: 14, fontFamily: "'DM Mono',monospace", background: "#fafafa", outline: "none",
             }}
           />
-          <span style={{ fontSize: 12, color: D.tx4 }}>
-            {t("→ See where you stand in the band", "→ 看你在薪資帶中的位置")}
-          </span>
-          {actual > 0 && (
-            <span style={{ fontSize: 12, color: D.slate, fontFamily: "'DM Mono',monospace" }}>
-              {t("P25: below band  P50: market mid  P75: top of band", "P25=低於中位 P50=市場中位 P75=高於中位")}
-            </span>
-          )}
+          {actual > 0 && (() => {
+            const cr85 = actual < 85 * 0.85;
+            const cr115 = actual > 85 * 1.15;
+            return (
+              <div style={{ fontSize: 12, padding: "5px 12px", borderRadius: 6, background: cr85 ? "#fdecea" : cr115 ? "#eafaf1" : "#fef9e7", color: cr85 ? "#c0392b" : cr115 ? "#27ae60" : "#e67e22", fontFamily: "'DM Mono',monospace" }}>
+                {cr85 ? t("⚠ Below market floor (P25)","⚠ 低於市場下限 P25") : cr115 ? t("✓ Above market top (P75)","✓ 超過市場頂端 P75") : t("✓ Within market band","✓ 落在市場帶寬內")}
+              </div>
+            );
+          })()}
         </div>
       </Card>
 
       <WorldMap selected={selC} onSelect={togC} t={t} />
 
-      <Card glow style={{ marginTop: 12 }}>
-        <div style={{ padding: 18 }}>
-          {/* Level headers */}
-          <div style={{ display: "flex", gap: 4, marginBottom: 8, paddingLeft: 120 }}>
-            {lvls.map((l, li) => (
-              <div key={l.id} style={{ flex: 1, textAlign: "center", fontSize: 11, color: D.tx4, fontFamily: "'DM Mono',monospace", fontWeight: 500 }}>
-                {l.id.toUpperCase()}
+      {sel.map((c, ci) => (
+        <Card key={c.id} glow style={{ marginTop: 12 }}>
+          <div style={{ padding: "14px 18px" }}>
+            {/* Country header */}
+            <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 12 }}>
+              <span style={{ fontSize: 22 }}>{c.flag}</span>
+              <div>
+                <div style={{ fontSize: 16, fontWeight: 600, color: D.tx, fontFamily: "'DM Mono','Noto Sans TC',monospace" }}>{t(c.n, c.zh)}</div>
+                <div style={{ fontSize: 11, color: D.tx4, fontFamily: "'DM Mono',monospace" }}>
+                  {showBand
+                    ? t("P25 / P50 midpoint / P75 · bar = band width","P25下限 / P50中位數 / P75上限 · 色條=帶寬範圍")
+                    : t("P50 midpoint salary","P50 市場中位薪資")}
+                </div>
               </div>
-            ))}
+            </div>
+
+            {showBand ? (
+              <div style={{ display: "grid", gridTemplateColumns: `repeat(${lvls.length}, 1fr)`, gap: 8 }}>
+                {lvls.map((l, li) => {
+                  const band = gBand(c.id, selFam, selSub, track, li);
+                  return <BandCell key={l.id} band={band} actual={actual} color={bC[ci]} usdt={usdt} lvlId={l.id.toUpperCase()} />;
+                })}
+              </div>
+            ) : (
+              <div style={{ display: "grid", gridTemplateColumns: `repeat(${lvls.length}, 1fr)`, gap: 8 }}>
+                {lvls.map((l, li) => {
+                  const v = gS(c.id, selFam, selSub, track, li);
+                  const mx = Math.max(...sel.map(x => gS(x.id, selFam, selSub, track, lvls.length - 1)));
+                  return (
+                    <div key={l.id} style={{ padding: "10px 12px", borderRadius: 8, background: `${bC[ci]}06`, border: `1px solid ${bC[ci]}18` }}>
+                      <div style={{ fontSize: 10, fontWeight: 600, color: `${bC[ci]}aa`, fontFamily: "'DM Mono',monospace", letterSpacing: 1.5, marginBottom: 4 }}>{l.id.toUpperCase()}</div>
+                      <div style={{ fontSize: 20, fontWeight: 700, fontFamily: "'DM Mono',monospace", color: bC[ci], marginBottom: 6 }}>{fmt(v, usdt)}</div>
+                      <div style={{ height: 6, borderRadius: 3, background: "rgba(0,0,0,0.06)", overflow: "hidden" }}>
+                        <div style={{ width: `${(v / (mx * 1.08)) * 100}%`, height: "100%", background: bC[ci], opacity: 0.45, borderRadius: 3, transition: "width 0.6s" }} />
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            )}
           </div>
+        </Card>
+      ))}
 
-          {sel.map((c, ci) => (
-            <div key={c.id} style={{ marginBottom: 20 }}>
-              <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 8 }}>
-                <span style={{ fontSize: 18 }}>{c.flag}</span>
-                <span style={{ fontSize: 15, color: D.tx, fontWeight: 500 }}>{t(c.n, c.zh)}</span>
+      {/* ── COMPARISON RESULTS ─────────────────────── */}
+      {sel.length >= 2 && (() => {
+        const ranked = sel.map(c => ({
+          c,
+          p50: gS(c.id, selFam, selSub, track, selLvl),
+          band: gBand(c.id, selFam, selSub, track, selLvl),
+        })).sort((a, b) => b.p50 - a.p50);
+        const top = ranked[0];
+        const bot = ranked[ranked.length - 1];
+        const spread = top.p50 > 0 ? (top.p50 / bot.p50).toFixed(1) : 1;
+        // COL index (NYC=100)
+        const COL = { us:100,gb:88,ch:115,mt:62,ae:82,sg:94,hk:97,jp:78,kr:74,tw:58,ph:38,my:44 };
+        const colRanked = sel.map(c => ({
+          c, adj: gS(c.id, selFam, selSub, track, selLvl) / (COL[c.id] || 100) * 100,
+        })).sort((a, b) => b.adj - a.adj);
+        const colTop = colRanked[0];
+        // EE tax burden estimate
+        const TAX = { us:0.36,gb:0.34,ch:0.32,mt:0.27,ae:0.00,sg:0.28,hk:0.17,jp:0.40,kr:0.35,tw:0.22,ph:0.30,my:0.22 };
+        const netRanked = sel.map(c => ({
+          c, net: gS(c.id, selFam, selSub, track, selLvl) * (1 - (TAX[c.id] || 0.3)),
+        })).sort((a, b) => b.net - a.net);
+        const netTop = netRanked[0];
+        const lvlLabel = track === "ic" ? `IC${selLvl}` : `M${selLvl}`;
+
+        return (
+          <Card glow style={{ marginTop: 16, border: "1px solid rgba(84,99,120,0.15)", background: "rgba(84,99,120,0.03)" }}>
+            <div style={{ padding: "16px 20px" }}>
+              <div style={{ fontSize: 11, fontWeight: 600, letterSpacing: 2.5, color: D.slate, fontFamily: "'DM Mono',monospace", textTransform: "uppercase", marginBottom: 14 }}>
+                📊 {t("COMPARISON RESULTS","比較結果")} — {lvlLabel}
               </div>
+              <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(200px,1fr))", gap: 12 }}>
+                {[
+                  {
+                    icon: "🥇",
+                    title: t("Highest P50","最高市場中位"),
+                    country: top.c,
+                    value: `${fmt(top.p50, usdt)}`,
+                    sub: t(`Band: ${fmt(top.band.p25,usdt)} – ${fmt(top.band.p75,usdt)}`, `帶寬：${fmt(top.band.p25,usdt)} – ${fmt(top.band.p75,usdt)}`),
+                    color: D.sage,
+                  },
+                  {
+                    icon: "🔻",
+                    title: t("Lowest P50","最低市場中位"),
+                    country: bot.c,
+                    value: `${fmt(bot.p50, usdt)}`,
+                    sub: t(`${spread}× gap vs highest market`, `與最高市場差距 ${spread} 倍`),
+                    color: D.clay,
+                  },
+                  {
+                    icon: "💸",
+                    title: t("Best Take-Home","稅後最高到手"),
+                    country: netTop.c,
+                    value: `~${fmt(Math.round(netTop.net), usdt)}`,
+                    sub: t("After income tax + social security","扣除所得稅與社保後估算"),
+                    color: D.copper,
+                  },
+                  {
+                    icon: "🏠",
+                    title: t("Best Purchasing Power","最佳購買力（COL調整）"),
+                    country: colTop.c,
+                    value: `${fmt(Math.round(colTop.adj), usdt)}`,
+                    sub: t("Salary ÷ cost-of-living index (NYC=100)","薪資 ÷ 生活成本指數，紐約=100基準"),
+                    color: D.slate,
+                  },
+                ].map(({ icon, title, country, value, sub, color }) => (
+                  <div key={title} style={{ padding: "12px 14px", borderRadius: 8, background: `${color}08`, border: `1px solid ${color}20` }}>
+                    <div style={{ fontSize: 13, marginBottom: 6 }}>{icon} <span style={{ fontSize: 12, fontWeight: 600, color, fontFamily: "'DM Mono','Noto Sans TC',monospace" }}>{title}</span></div>
+                    <div style={{ display: "flex", alignItems: "center", gap: 6, marginBottom: 4 }}>
+                      <span style={{ fontSize: 18 }}>{country.flag}</span>
+                      <span style={{ fontSize: 13, fontWeight: 600, color: D.tx, fontFamily: "'DM Mono','Noto Sans TC',monospace" }}>{t(country.n, country.zh)}</span>
+                    </div>
+                    <div style={{ fontSize: 22, fontWeight: 700, fontFamily: "'DM Mono',monospace", color, marginBottom: 3 }}>{value}</div>
+                    <div style={{ fontSize: 11, color: D.tx4, lineHeight: 1.4 }}>{sub}</div>
+                  </div>
+                ))}
+              </div>
+              {/* Ranking bar */}
+              <div style={{ marginTop: 14, paddingTop: 12, borderTop: "1px solid rgba(0,0,0,0.05)" }}>
+                <div style={{ fontSize: 11, color: D.tx4, marginBottom: 8, fontFamily: "'DM Mono',monospace" }}>
+                  {t("P50 RANKING — all selected countries","P50 排名——所有選定國家")}
+                </div>
+                {ranked.map((r, i) => (
+                  <div key={r.c.id} style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 6 }}>
+                    <div style={{ width: 20, fontSize: 12, color: D.tx4, fontFamily: "'DM Mono',monospace", textAlign: "right" }}>#{i+1}</div>
+                    <div style={{ width: 22, fontSize: 16 }}>{r.c.flag}</div>
+                    <div style={{ width: 80, fontSize: 12, color: D.tx2, fontFamily: "'DM Mono','Noto Sans TC',monospace", fontWeight: 500 }}>{t(r.c.n, r.c.zh)}</div>
+                    <div style={{ flex: 1, height: 20, background: "rgba(0,0,0,0.04)", borderRadius: 4, overflow: "hidden" }}>
+                      <div style={{ width: `${(r.p50 / top.p50) * 100}%`, height: "100%", background: bC[sel.indexOf(r.c)], opacity: 0.5, borderRadius: 4, transition: "width 0.5s", display: "flex", alignItems: "center", paddingLeft: 6 }}>
+                        <span style={{ fontSize: 11, fontWeight: 600, fontFamily: "'DM Mono',monospace", color: "#fff" }}>{fmt(r.p50, usdt)}</span>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </Card>
+        );
+      })()}
 
-              {showBand ? (
-                // Band view: one row per level
-                <div style={{ display: "flex", gap: 4 }}>
-                  {lvls.map((l, li) => {
-                    const band = gBand(c.id, selFam, selSub, track, li);
-                    return (
-                      <div key={l.id} style={{ flex: 1 }}>
-                        <RangeBar band={band} actual={actual} color={bC[ci]} usdt={usdt} />
-                      </div>
-                    );
-                  })}
-                </div>
-              ) : (
-                // Point view: simple bar (original style)
-                <div style={{ display: "flex", gap: 4 }}>
-                  {lvls.map((l, li) => {
-                    const v = gS(c.id, selFam, selSub, track, li);
-                    const mx = Math.max(...sel.map(x => gS(x.id, selFam, selSub, track, lvls.length - 1)));
-                    return (
-                      <div key={l.id} style={{ flex: 1 }}>
-                        <div style={{ height: 34, borderRadius: 5, background: `${bC[ci]}06`, position: "relative", overflow: "hidden" }}>
-                          <div style={{ width: `${(v / (mx * 1.1)) * 100}%`, height: "100%", background: `${bC[ci]}20`, borderRadius: 4, transition: "width 0.7s" }} />
-                          <span style={{ position: "absolute", left: 8, top: "50%", transform: "translateY(-50%)", fontSize: 13, fontWeight: 500, fontFamily: "'DM Mono',monospace", color: bC[ci] }}>
-                            {fmt(v, usdt)}
-                          </span>
-                        </div>
-                      </div>
-                    );
-                  })}
-                </div>
-              )}
+      {/* Legend */}
+      {showBand && sel.length > 0 && (
+        <div style={{ display: "flex", gap: 20, marginTop: 10, flexWrap: "wrap" }}>
+          {[
+            { dot: "rect", color: "#aaa",    label: t("P25 — market floor (85% of midpoint)","P25 — 市場下限（中位的85%）") },
+            { dot: "line", color: D.slate,   label: t("P50 — midpoint (standard offer target)","P50 — 市場中位（標準Offer水位）") },
+            { dot: "rect", color: "#aaa",    label: t("P75 — top of band (120% of midpoint)","P75 — 帶頂（中位的120%）") },
+            { dot: "dot",  color: "#e67e22", label: t("● Your salary (Compa-Ratio dot)","● 你的薪資（CR比值點）") },
+          ].map(({ dot, color, label }, i) => (
+            <div key={i} style={{ display: "flex", alignItems: "center", gap: 6, fontSize: 11, color: D.tx4 }}>
+              {dot === "line"
+                ? <div style={{ width: 3, height: 14, borderRadius: 2, background: color, opacity: 0.8 }} />
+                : dot === "dot"
+                ? <div style={{ width: 10, height: 10, borderRadius: "50%", background: color }} />
+                : <div style={{ width: 14, height: 8, borderRadius: 3, background: color, opacity: 0.3 }} />
+              }
+              <span>{label}</span>
             </div>
           ))}
-
-          {/* Legend */}
-          {showBand && (
-            <div style={{ display: "flex", gap: 16, marginTop: 8, paddingTop: 12, borderTop: "1px solid #f0f0f4", flexWrap: "wrap" }}>
-              {[
-                { label: t("P25 (85%)", "P25 下四分位"), color: "#aaa" },
-                { label: t("P50 mid", "P50 中位"), color: D.slate },
-                { label: t("P75 (120%)", "P75 上四分位"), color: "#aaa" },
-                { label: t("Your salary", "你的薪資"), color: "#e67e22" },
-              ].map(({ label, color }) => (
-                <div key={label} style={{ display: "flex", alignItems: "center", gap: 5, fontSize: 11, color: D.tx4 }}>
-                  <div style={{ width: 10, height: 10, borderRadius: "50%", background: color }} />
-                  {label}
-                </div>
-              ))}
-            </div>
-          )}
         </div>
-      </Card>
+      )}
     </div>
   );
 }

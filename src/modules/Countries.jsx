@@ -119,9 +119,28 @@ export default function Countries({ search, setSearch, detail, setDetail, ready,
 
   return (
     <div>
-      <div style={{ fontSize: 28, fontWeight: 500, color: D.tx, fontFamily: "'DM Mono','Noto Sans TC',monospace", marginBottom: 20 }}>
+      <div style={{ fontSize: 28, fontWeight: 500, color: D.tx, fontFamily: "'DM Mono','Noto Sans TC',monospace", marginBottom: 8 }}>
         {t("Country Profiles", "國家檔案")}
       </div>
+      <div style={{ fontSize: 14, color: D.tx3, marginBottom: 14 }}>
+        {t("12 jurisdictions — click any country card to deep-dive into salary benchmarks, labor law, holidays, and regulatory status","12個司法管轄區——點擊任一國家卡片，深入查看薪資基準、勞動法規、假日與監管狀態")}
+      </div>
+
+      {/* What's inside guide */}
+      <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(190px,1fr))", gap: 8, marginBottom: 16 }}>
+        {[
+          { icon: "💰", title: t("Salary Benchmark","薪資基準"),    desc: t("Country multiplier vs US baseline. How much does the same role pay here vs Silicon Valley?","相對美國基準的薪資乘數。同一職位在這裡與矽谷的薪資差距。") },
+          { icon: "📜", title: t("Labor Law Summary","勞動法規摘要"), desc: t("Key leave policies, notice period, severance formula, and social security rates at a glance.","休假政策、預告期、資遣費公式與社保比率重點摘要。") },
+          { icon: "🏛️", title: t("Regulatory Status","監管狀態"),   desc: t("Crypto licensing framework: Regulated / Evolving. Includes latest regulatory update and effective date.","加密貨幣牌照狀態：已監管/演進中。含最新法規動態與生效日期。") },
+          { icon: "📅", title: t("Public Holidays","國定假日"),      desc: t("Full holiday list for the country. Cross-reference with Calendar module for multi-country scheduling.","完整國定假日清單，搭配假日行事曆模組進行跨國排程。") },
+        ].map(({ icon, title, desc }) => (
+          <div key={title} style={{ padding: "10px 14px", borderRadius: 8, background: "rgba(0,0,0,0.02)", border: "1px solid rgba(0,0,0,0.05)" }}>
+            <div style={{ fontSize: 15, marginBottom: 4 }}>{icon} <span style={{ fontSize: 12, fontWeight: 600, color: "#2d3142", fontFamily: "'DM Mono','Noto Sans TC',monospace" }}>{title}</span></div>
+            <div style={{ fontSize: 11, color: "#7d7d88", lineHeight: 1.55 }}>{desc}</div>
+          </div>
+        ))}
+      </div>
+
       <Card glow style={{ marginBottom: 12 }}>
         <div style={{ padding: "8px 14px", display: "flex", alignItems: "center", gap: 8 }}>
           <span style={{ color: D.tx4 }}>⌕</span>

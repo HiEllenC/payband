@@ -1,9 +1,11 @@
+import { useState } from "react";
 import Card from "../components/Card.jsx";
 import WorldMap from "../components/WorldMap.jsx";
 import JobSelector from "../components/JobSelector.jsx";
 import { COUNTRIES } from "../data/countries.js";
 import { TC } from "../data/totalcomp.js";
 import { gS, fmt } from "../utils/salary.js";
+import VestingSim from "./VestingSim.jsx";
 
 const D = {
   tx: "#1c1c1f",
@@ -23,6 +25,7 @@ const D = {
 
 // ═══════ TOTAL COMP MODULE ═══════
 export default function TotalComp({ selC, togC, selFam, setSelFam, selSub, setSelSub, track, setTrack, selLvl, setSelLvl, usdt, lang, t }) {
+  const [subView, setSubView] = useState("comp"); // "comp" | "vesting"
   const sel = selC.map(id => COUNTRIES.find(c => c.id === id)).filter(Boolean);
   const li = selLvl;
   const parts = [
@@ -50,14 +53,58 @@ export default function TotalComp({ selC, togC, selFam, setSelFam, selSub, setSe
 
   return (
     <div>
+      {/* ── SUB-TAB BAR ────────────────────────────── */}
+      <div style={{ display: "flex", gap: 2, marginBottom: 24, borderBottom: `1px solid ${D.ln}`, paddingBottom: 0 }}>
+        {[
+          { id: "comp",    label: t("Comp Breakdown", "薪酬結構拆解") },
+          { id: "vesting", label: t("Vesting Simulator", "代幣/股權歸屬模擬") },
+        ].map(sv => (
+          <button key={sv.id} onClick={() => setSubView(sv.id)} style={{
+            background: "transparent", border: "none",
+            color: subView === sv.id ? D.tx : D.tx4,
+            padding: "8px 18px", cursor: "pointer",
+            fontSize: 14, fontWeight: subView === sv.id ? 600 : 400,
+            fontFamily: "'DM Mono','Noto Sans TC',monospace",
+            borderBottom: subView === sv.id ? `2px solid ${D.slate}` : "2px solid transparent",
+            marginBottom: -1, transition: "all 0.2s",
+          }}>
+            {sv.label}
+          </button>
+        ))}
+      </div>
+
+      {subView === "vesting" && (
+        <VestingSim usdt={usdt} lang={lang} t={t} />
+      )}
+
+      {subView === "comp" && (<>
       <div style={{ marginBottom: 20 }}>
         <div style={{ fontSize: 28, fontWeight: 500, color: D.tx, fontFamily: "'DM Mono','Noto Sans TC',monospace" }}>
-          {t("Total Compensation Anatomy", "總薪酬結構解剖")}
+          {t("Compensation Structure Breakdown", "薪酬結構拆解")}
         </div>
         <p style={{ fontSize: 14, color: D.tx3, marginTop: 4 }}>
-          {t("Beyond base salary — the full employer cost", "超越底薪——雇主實際成本全貌")}
+          {t("Base · Bonus · Token · ER Social · Allowance — the full employer cost across 12 countries", "底薪・獎金・代幣・雇主社保・津貼——12國雇主實際總成本全貌")}
         </p>
       </div>
+      {/* Component guide */}
+      <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(180px,1fr))", gap: 8, marginBottom: 14 }}>
+        {[
+          { key: "Base",    color: D.slate,  zh: "底薪",    desc: t("Core salary — country benchmark","各國市場基準底薪，最大比重") },
+          { key: "Bonus",   color: D.sage,   zh: "獎金",    desc: t("Performance + 13th month","績效/年終，依國家習俗差異大") },
+          { key: "Token",   color: D.copper, zh: "代幣/股權", desc: t("RSU / Token / ESOP grant value","加密交易所薪酬核心，佔比30-60%") },
+          { key: "ER Cost", color: D.clay,   zh: "雇主社保", desc: t("Statutory employer social security","法定雇主提撥，AE最高12.5%") },
+          { key: "Allow",   color: D.wine,   zh: "津貼",    desc: t("Housing / transport / relocation","UAE津貼最豐，JP/KR/TW較少") },
+        ].map(({ key, color, zh, desc }) => (
+          <div key={key} style={{ padding: "10px 14px", borderRadius: 8, background: color + "08", border: `1px solid ${color}18`, display: "flex", gap: 10, alignItems: "flex-start" }}>
+            <div style={{ width: 8, height: 8, borderRadius: "50%", background: color, opacity: 0.7, marginTop: 4, flexShrink: 0 }} />
+            <div>
+              <div style={{ fontSize: 12, fontWeight: 600, color: D.tx, fontFamily: "'DM Mono','Noto Sans TC',monospace" }}>{t(key, zh)}</div>
+              <div style={{ fontSize: 11, color: D.tx3, lineHeight: 1.5, marginTop: 2 }}>{desc}</div>
+            </div>
+          </div>
+        ))}
+      </div>
+
       <JobSelector
         selFam={selFam} setSelFam={setSelFam}
         selSub={selSub} setSelSub={setSelSub}
@@ -190,7 +237,7 @@ export default function TotalComp({ selC, togC, selFam, setSelFam, selSub, setSe
           </Card>
 
           {/* DETAIL CHIPS */}
-          <div style={{ display: "grid", gridTemplateColumns: "repeat(" + Math.min(sel.length, 3) + ",1fr)", gap: 12 }}>
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(" + Math.min(sel.length, 3) + ",1fr)", gap: 12, marginBottom: 14 }}>
             {data.map(d => (
               <Card key={d.c.id} glow>
                 <div style={{ padding: "14px 16px" }}>
@@ -207,8 +254,67 @@ export default function TotalComp({ selC, togC, selFam, setSelFam, selSub, setSe
               </Card>
             ))}
           </div>
+
+          {/* ── COMPARISON RESULTS ─────────────────────── */}
+          {data.length >= 2 && (() => {
+            const byTotal   = [...data].sort((a,b) => b.total - a.total);
+            const byMulti   = [...data].sort((a,b) => (b.tc.multi||1) - (a.tc.multi||1));
+            const byToken   = [...data].sort((a,b) => (b.tc.token||0) - (a.tc.token||0));
+            const byER      = [...data].sort((a,b) => (b.tc.er||0) - (a.tc.er||0));
+            const cheapest  = byTotal[byTotal.length - 1];
+            const costliest = byTotal[0];
+            const spread    = costliest.total > 0 ? (costliest.total / cheapest.total).toFixed(1) : 1;
+
+            return (
+              <Card glow style={{ border: "1px solid rgba(84,99,120,0.15)", background: "rgba(84,99,120,0.03)" }}>
+                <div style={{ padding: "16px 20px" }}>
+                  <div style={{ fontSize: 11, fontWeight: 600, letterSpacing: 2.5, color: D.slate, fontFamily: "'DM Mono',monospace", textTransform: "uppercase", marginBottom: 14 }}>
+                    📊 {t("COMPARISON RESULTS — TOTAL EMPLOYER COST","比較結果 — 雇主總成本")}
+                  </div>
+                  <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(190px,1fr))", gap: 12, marginBottom: 16 }}>
+                    {[
+                      { icon:"💰", title: t("Most Expensive to Hire","雇用成本最高"),   d: costliest, val: fmt(costliest.total, usdt), sub: t(`${costliest.tc.multi||"—"}× base · ${spread}× vs cheapest`,`${costliest.tc.multi||"—"}倍底薪・是最低成本的${spread}倍`), color: D.clay },
+                      { icon:"✅", title: t("Most Affordable","雇用成本最低"),           d: cheapest,  val: fmt(cheapest.total, usdt),  sub: t(`${cheapest.tc.multi||"—"}× base`,`${cheapest.tc.multi||"—"}倍底薪`), color: D.sage },
+                      { icon:"🪙", title: t("Highest Token Allocation","代幣比例最高"),  d: byToken[0],val: `${byToken[0].tc.token||0}%`,  sub: t(byToken[0].tc.tN || "—", byToken[0].tc.tN || "—"), color: D.copper },
+                      { icon:"🛡️", title: t("Highest ER Social Cost","雇主社保最重"),   d: byER[0],   val: `${byER[0].tc.er||0}%`,         sub: t(byER[0].tc.erL || "—", byER[0].tc.erL || "—"), color: D.wine },
+                    ].map(({ icon, title, d, val, sub, color }) => (
+                      <div key={title} style={{ padding: "12px 14px", borderRadius: 8, background: `${color}08`, border: `1px solid ${color}20` }}>
+                        <div style={{ fontSize: 12, marginBottom: 6 }}>{icon} <span style={{ fontWeight: 600, color, fontFamily: "'DM Mono','Noto Sans TC',monospace" }}>{title}</span></div>
+                        <div style={{ display: "flex", alignItems: "center", gap: 6, marginBottom: 4 }}>
+                          <span style={{ fontSize: 18 }}>{d.c.flag}</span>
+                          <span style={{ fontSize: 12, fontWeight: 600, color: D.tx, fontFamily: "'DM Mono','Noto Sans TC',monospace" }}>{t(d.c.n, d.c.zh)}</span>
+                        </div>
+                        <div style={{ fontSize: 22, fontWeight: 700, fontFamily: "'DM Mono',monospace", color, marginBottom: 3 }}>{val}</div>
+                        <div style={{ fontSize: 11, color: D.tx4 }}>{sub}</div>
+                      </div>
+                    ))}
+                  </div>
+                  {/* Ranked bar */}
+                  <div style={{ paddingTop: 12, borderTop: "1px solid rgba(0,0,0,0.05)" }}>
+                    <div style={{ fontSize: 11, color: D.tx4, marginBottom: 8, fontFamily: "'DM Mono',monospace" }}>
+                      {t("TOTAL COST RANKING","總成本排名")}
+                    </div>
+                    {byTotal.map((d, i) => (
+                      <div key={d.c.id} style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 6 }}>
+                        <div style={{ width: 20, fontSize: 12, color: D.tx4, fontFamily: "'DM Mono',monospace", textAlign: "right" }}>#{i+1}</div>
+                        <span style={{ fontSize: 16 }}>{d.c.flag}</span>
+                        <div style={{ width: 80, fontSize: 12, fontWeight: 500, color: D.tx2, fontFamily: "'DM Mono','Noto Sans TC',monospace" }}>{t(d.c.n, d.c.zh)}</div>
+                        <div style={{ flex: 1, height: 20, background: "rgba(0,0,0,0.04)", borderRadius: 4, overflow: "hidden" }}>
+                          <div style={{ width: `${(d.total / byTotal[0].total) * 100}%`, height: "100%", background: D.slate, opacity: 0.4, borderRadius: 4, transition: "width 0.5s", display: "flex", alignItems: "center", paddingLeft: 6 }}>
+                            <span style={{ fontSize: 11, fontWeight: 600, fontFamily: "'DM Mono',monospace", color: "#fff", whiteSpace:"nowrap" }}>{fmt(d.total, usdt)}</span>
+                          </div>
+                        </div>
+                        <div style={{ width: 36, fontSize: 11, color: D.copper, fontFamily: "'DM Mono',monospace", textAlign: "right" }}>{d.tc.multi||"—"}×</div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </Card>
+            );
+          })()}
         </div>
       )}
+      </>)}
     </div>
   );
 }

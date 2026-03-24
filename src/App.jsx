@@ -8,6 +8,9 @@ import LaborLaw from "./modules/LaborLaw.jsx";
 import Calendar from "./modules/Calendar.jsx";
 import Regulation from "./modules/Regulation.jsx";
 import Countries from "./modules/Countries.jsx";
+import Relocation from "./modules/Relocation.jsx";
+import GrossToNet from "./modules/GrossToNet.jsx";
+import Markets from "./modules/Markets.jsx";
 
 // Data
 import { FAMS } from "./data/jobs.js";
@@ -63,13 +66,16 @@ export default function App() {
   const togC = id => setSelC(p => p.includes(id) ? p.filter(x => x !== id) : p.length < 6 ? [...p, id] : p);
 
   const TABS = [
-    { id: "home", e: "Home", z: "首頁" },
-    { id: "salary", e: "Salary", z: "薪資" },
-    { id: "totalcomp", e: "Total Comp", z: "總薪酬" },
-    { id: "labor", e: "Labor Law", z: "勞動法規" },
-    { id: "calendar", e: "Calendar", z: "行事曆" },
-    { id: "regulation", e: "Regulation", z: "法規" },
-    { id: "countries", e: "Countries", z: "國家" },
+    { id: "home",       e: "Home",            z: "首頁" },
+    { id: "salary",     e: "Salary Matrix",   z: "薪資帶寬" },
+    { id: "totalcomp",  e: "Comp Structure",  z: "薪酬結構" },
+    { id: "relocate",   e: "Cross-Border",    z: "跨境調派" },
+    { id: "netpay",     e: "Take-Home",       z: "到手試算" },
+    { id: "markets",    e: "FX & Crypto",     z: "匯率與幣市" },
+    { id: "labor",      e: "Labor Law",       z: "勞動法規" },
+    { id: "calendar",   e: "Holidays",        z: "假日行事曆" },
+    { id: "regulation", e: "Reg Tracker",     z: "監管動態" },
+    { id: "countries",  e: "Country Files",   z: "國家檔案" },
   ];
 
   const Header = () => (
@@ -77,19 +83,20 @@ export default function App() {
       <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", maxWidth: 1360, margin: "0 auto", height: 58, padding: "0 28px" }}>
         <div style={{ display: "flex", alignItems: "center", gap: 6, cursor: "pointer" }} onClick={() => { setTab("home"); setDetail(null); }}>
           <span style={{ fontSize: 18, fontWeight: 500, fontFamily: "'DM Mono',monospace", color: D.ink, letterSpacing: 2 }}>
-            Crypto<span style={{ color: D.slate }}>Comp</span>
+            Pay<span style={{ color: D.slate }}>band</span>
           </span>
         </div>
-        <nav style={{ display: "flex", gap: 1 }}>
+        <nav style={{ display: "flex", gap: 1, overflowX: "auto", msOverflowStyle: "none", scrollbarWidth: "none", flex: 1, margin: "0 16px" }}>
+          <style>{`::-webkit-scrollbar{display:none}`}</style>
           {TABS.map(i => (
             <button key={i.id} onClick={() => { setTab(i.id); setDetail(null); }} style={{
               background: "transparent", border: "none",
               color: tab === i.id ? D.tx : D.tx4,
               padding: "6px 12px", cursor: "pointer",
-              fontSize: 14, fontWeight: tab === i.id ? 500 : 400,
+              fontSize: 13, fontWeight: tab === i.id ? 500 : 400,
               fontFamily: "'DM Mono','Noto Sans TC',monospace",
               borderBottom: tab === i.id ? `2px solid ${D.slate}` : "2px solid transparent",
-              transition: "all 0.2s",
+              transition: "all 0.2s", whiteSpace: "nowrap", flexShrink: 0,
             }}>
               {t(i.e, i.z)}
             </button>
@@ -137,6 +144,15 @@ export default function App() {
               {...sharedJobProps}
               usdt={usdt} lang={lang} t={t}
             />
+          )}
+          {tab === "relocate" && (
+            <Relocation lang={lang} t={t} />
+          )}
+          {tab === "markets" && (
+            <Markets lang={lang} t={t} usdt={usdt} />
+          )}
+          {tab === "netpay" && (
+            <GrossToNet lang={lang} t={t} />
           )}
           {tab === "labor" && (
             <LaborLaw selC={selC} togC={togC} lang={lang} t={t} />

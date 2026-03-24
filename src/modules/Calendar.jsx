@@ -105,8 +105,23 @@ export default function Calendar({ selC, togC, calView, setCalView, lang, t }) {
       <div style={{ fontSize: 28, fontWeight: 500, color: D.tx, fontFamily: "'DM Mono','Noto Sans TC',monospace", marginBottom: 6 }}>
         {t("Attendance & Holiday Calendar", "考勤與假日行事曆")}
       </div>
-      <div style={{ fontSize: 14, color: D.tx3, marginBottom: 20 }}>
+      <div style={{ fontSize: 14, color: D.tx3, marginBottom: 14 }}>
         {t("Cross-border working day analysis with public holiday overlay", "跨境工作日分析與國定假日疊加對比")}
+      </div>
+
+      {/* Guide cards */}
+      <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(200px,1fr))", gap: 8, marginBottom: 16 }}>
+        {[
+          { icon: "📋", title: t("Attendance Sheet","考勤總表"),   desc: t("Matrix view — all countries vs all dates. Quickly spot overlapping holidays when scheduling cross-border meetings.","矩陣視圖，一眼看出哪天哪國放假，安排跨國會議必備。") },
+          { icon: "📅", title: t("Monthly Calendar","月曆模式"),   desc: t("Month-by-month calendar per country. Shows holiday chips and type badges for each day.","每月日曆逐日顯示假日名稱與類型，直覺好懂。") },
+          { icon: "📊", title: t("Year Comparison","跨年對比"),     desc: t("Select one country — compare total working days and holidays across 2025, 2026, 2027.","選定單一國家，比較三個年度的總工作日與假日差異。") },
+          { icon: "🏷️", title: t("Holiday Types","假日類型說明"), desc: t("R=Regular (200% pay in PH) · S=Special Non-Working (130% PH) · O=Observed substitute · B=UK Bank Holiday","R=法定假・S=特別非工作日（菲律賓130%）・O=補假・B=英國銀行假日") },
+        ].map(({ icon, title, desc }) => (
+          <div key={title} style={{ padding: "10px 14px", borderRadius: 8, background: "rgba(0,0,0,0.02)", border: "1px solid rgba(0,0,0,0.05)" }}>
+            <div style={{ fontSize: 15, marginBottom: 4 }}>{icon} <span style={{ fontSize: 12, fontWeight: 600, color: "#2d3142", fontFamily: "'DM Mono','Noto Sans TC',monospace" }}>{title}</span></div>
+            <div style={{ fontSize: 11, color: "#7d7d88", lineHeight: 1.55 }}>{desc}</div>
+          </div>
+        ))}
       </div>
 
       <WorldMap selected={selC} onSelect={togC} t={t} />

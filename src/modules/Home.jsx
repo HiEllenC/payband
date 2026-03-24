@@ -76,18 +76,42 @@ export default function Home({ selC, togC, setTab, ready, t }) {
       {/* Feature cards */}
       <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 14, marginTop: 36 }}>
         {[
-          { t: t("Total Comp Anatomy", "總薪酬結構解剖"), d: t("Base, bonus, token, employer cost — full picture", "底薪、獎金、代幣、雇主成本——全貌"), c: D.slate, go: "totalcomp" },
-          { t: t("Salary Matrix", "薪資矩陣"), d: t("8 families × 24 roles × dual track × 12 countries", "8族群×24職位×雙軌道×12國"), c: D.sage, go: "salary" },
-          { t: t("Labor Law", "勞動法規"), d: t("Leave, severance, notice — side by side", "假別、資遣、預告——並列對比"), c: D.copper, go: "labor" },
-          { t: t("Calendars", "行事曆"), d: t("Public holidays for every jurisdiction", "12國國定假日"), c: D.clay, go: "calendar" },
-          { t: t("Crypto Regulation", "幣圈法規"), d: t("Licensing, tax, regulatory status", "牌照、稅務、監管"), c: D.wine, go: "regulation" },
-          { t: t("Country Profiles", "國家檔案"), d: t("Deep-dive with all data layers", "所有維度深度整合"), c: D.tx3, go: "countries" },
+          {
+            t: t("Comp Structure", "薪酬結構拆解"),
+            d: t("Compare Base + Bonus + Token + ER Social + Allowance across countries. See which jurisdiction has the highest total employer cost.", "比較各國底薪・獎金・代幣・雇主社保・津貼組合。含代幣歸屬模擬器：4年時間表×3種價格情境。"),
+            c: D.slate, go: "totalcomp",
+          },
+          {
+            t: t("Salary Band Matrix", "薪資帶寬矩陣"),
+            d: t("P25 / P50 / P75 salary bands for 12 job families × 48 roles × IC & Management tracks × 12 countries. Includes Compa-Ratio checker.", "12職能族群×48子職能×雙軌道×12國的P25/P50/P75帶寬。含Compa-Ratio快速比較你的薪資位置。"),
+            c: D.sage, go: "salary",
+          },
+          {
+            t: t("Cross-Border Relocation", "跨境調派規劃"),
+            d: t("From → To country planner: salary delta, take-home diff, employer cost, visa requirements & relocation budget in one card.", "選起始國→目的國，一張卡片顯示薪資差額、稅後對比、簽證費用與搬遷預算。"),
+            c: D.copper, go: "relocate",
+          },
+          {
+            t: t("Take-Home Calculator", "到手薪資試算"),
+            d: t("Enter any gross salary → see net pay after income tax + social security in all 12 countries side by side. AE = 0% tax.", "輸入毛薪，即時比較12國稅後到手。阿聯酋0%稅，日本扣近50%，差距一目瞭然。"),
+            c: D.clay, go: "netpay",
+          },
+          {
+            t: t("Labor Law Matrix", "勞動法規矩陣"),
+            d: t("20 categories across 5 dimensions — leave, probation, severance, social security, termination. Sticky country compare table.", "5大維度×20項類別並列對比，含年假天數、產假週數、資遣費公式、加班費率等。"),
+            c: D.wine, go: "labor",
+          },
+          {
+            t: t("Holiday Calendar", "假日行事曆"),
+            d: t("3 views: Attendance matrix, monthly calendar, year comparison. 2025–2027 verified holiday database with type tags.", "3種模式：考勤矩陣・月曆・跨年對比。2025–2027官方假日資料庫，含假日類型標記。"),
+            c: D.tx3, go: "calendar",
+          },
         ].map((f, i) => (
           <Card key={i} accent={f.c} onClick={() => setTab(f.go)} style={{ opacity: ready ? 1 : 0, transform: ready ? "translateY(0)" : "translateY(12px)", transition: `all 0.5s ease ${0.5 + i * 0.06}s` }}>
             <div style={{ padding: "20px 18px" }}>
               <div style={{ width: 24, height: 2, borderRadius: 2, background: f.c, opacity: 0.4, marginBottom: 14 }} />
               <div style={{ fontSize: 16, fontWeight: 500, color: D.tx, fontFamily: "'DM Mono','Noto Sans TC',monospace" }}>{f.t}</div>
-              <p style={{ fontSize: 14, color: D.tx3, marginTop: 8, lineHeight: 1.55 }}>{f.d}</p>
+              <p style={{ fontSize: 13, color: D.tx3, marginTop: 8, lineHeight: 1.65 }}>{f.d}</p>
               <div style={{ marginTop: 14, fontSize: 13, color: f.c, fontWeight: 500, fontFamily: "'DM Mono',monospace" }}>{t("Explore →", "前往 →")}</div>
             </div>
           </Card>
