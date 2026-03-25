@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { COUNTRIES } from "../data/countries.js";
 
 const FONT = "'DM Mono','Noto Sans TC',monospace";
@@ -120,12 +120,93 @@ function markerPos(id) {
   ];
 }
 
-// ── Component ────────────────────────────────────────────────────────────────
-export default function WorldMap({ selected, onSelect, countries = COUNTRIES, t: tr }) {
+// Dots that get a subtle SVG pulse animation
+const PULSE_IDS = new Set(["us", "ae", "sg"]);
+
+// ── Static decorative map (hero section) ─────────────────────────────────────
+function WorldMapStatic() {
+  return (
+    <div style={{
+      borderRadius: 10, overflow: "hidden",
+      border: "1px solid rgba(56,81,106,0.6)",
+      boxShadow: "0 4px 32px rgba(0,0,0,0.28)",
+      background: D.ocean,
+    }}>
+      <svg viewBox={`0 0 ${W} ${H}`} style={{ width: "100%", display: "block" }}>
+        {/* Ocean */}
+        <rect width={W} height={H} fill={D.ocean} />
+
+        {/* Graticule */}
+        <g stroke={D.grid} strokeWidth="0.5">
+          {[-60,-30,0,30,60].map(lat => {
+            const y = (90 - lat) / 180 * H;
+            return <line key={lat} x1="0" y1={y} x2={W} y2={y} />;
+          })}
+          {[-120,-60,0,60,120].map(lon => {
+            const x = (lon + 180) / 360 * W;
+            return <line key={lon} x1={x} y1="0" x2={x} y2={H} />;
+          })}
+        </g>
+
+        {/* Equator label */}
+        <text x="6" y={(90 / 180) * H - 3}
+          fontSize="7" fill="rgba(255,255,255,0.15)" fontFamily={FONT}>0°</text>
+
+        {/* Landmasses */}
+        {LAND_PATHS.map((d, i) => (
+          <path key={i} d={d}
+            fill={D.land} stroke={D.landStroke}
+            strokeWidth="0.5" strokeLinejoin="round" />
+        ))}
+
+        {/* Country markers — all static, same accent color */}
+        {Object.keys(CAPS).map(id => {
+          const [cx, cy] = markerPos(id);
+          const anch = ANCHOR[id] === "right";
+          const lx   = anch ? cx + 11 : cx - 11;
+          const pulse = PULSE_IDS.has(id);
+
+          return (
+            <g key={id}>
+              {/* Pulse ring on select dots */}
+              {pulse && (
+                <circle cx={cx} cy={cy} r="4" fill="none"
+                  stroke={D.selected} strokeWidth="1">
+                  <animate attributeName="r" values="4;14;4" dur="3s" repeatCount="indefinite" />
+                  <animate attributeName="opacity" values="0.6;0;0.6" dur="3s" repeatCount="indefinite" />
+                </circle>
+              )}
+              {/* Dot */}
+              <circle cx={cx} cy={cy} r="4.5"
+                fill={D.selected}
+                stroke="rgba(255,255,255,0.2)" strokeWidth="1"
+              />
+              {/* Code label */}
+              <text
+                x={lx} y={cy + 4}
+                textAnchor={anch ? "start" : "end"}
+                fontSize="8.5" fontFamily={FONT} fontWeight="500"
+                fill="rgba(122,184,217,0.75)"
+                style={{ pointerEvents: "none", userSelect: "none" }}
+              >
+                {CODE[id]}
+              </text>
+            </g>
+          );
+        })}
+      </svg>
+    </div>
+  );
+}
+
+// ── Interactive map (used in other modules) ───────────────────────────────────
+export default function WorldMap({ selected, onSelect, countries = COUNTRIES, t: tr, static: isStatic }) {
   const [hov, setHov] = useState(null);
   const [tip, setTip] = useState(null);
 
-  const cMap = Object.fromEntries(countries.map(c => [c.id, c]));
+  const cMap = useMemo(() => Object.fromEntries(countries.map(c => [c.id, c])), [countries]);
+
+  if (isStatic) return <WorldMapStatic />;
 
   return (
     <div style={{

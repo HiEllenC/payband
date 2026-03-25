@@ -50,10 +50,7 @@ export default function Home({ selC, togC, setTab, ready, t }) {
           </div>
         </div>
         <div style={{ opacity: ready ? 1 : 0, transform: ready ? "translateX(0)" : "translateX(20px)", transition: "all 0.8s cubic-bezier(.22,1,.36,1) 0.2s" }}>
-          <WorldMap selected={selC} onSelect={togC} t={t} />
-          <div style={{ textAlign: "center", marginTop: 6 }}>
-            <span style={{ fontSize: 12, color: D.tx4 }}>{t("Click countries to compare", "點選國家進行比較")}</span>
-          </div>
+          <WorldMap static />
         </div>
       </div>
 
