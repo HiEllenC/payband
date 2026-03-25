@@ -141,29 +141,41 @@ const CONNECTIONS = [
 ];
 
 // ── Static decorative map (hero section) ─────────────────────────────────────
+// Returns a quadratic bezier arc path between two points.
+// The control point is pulled upward (toward the top of the map) so
+// long-haul routes bow naturally rather than cutting through land.
+function arcPath(x1, y1, x2, y2) {
+  const mx = (x1 + x2) / 2;
+  const my = (y1 + y2) / 2;
+  const dist = Math.hypot(x2 - x1, y2 - y1);
+  // Pull the midpoint upward — more for longer routes
+  const lift = Math.min(dist * 0.22, 80);
+  return `M${x1},${y1} Q${mx},${my - lift} ${x2},${y2}`;
+}
+
 function WorldMapStatic() {
-  // Pre-compute positions
   const pos = {};
   IDS.forEach(id => { pos[id] = markerPos(id); });
 
   return (
     <div style={{
-      borderRadius: 12, overflow: "hidden",
-      border: "1px solid #c8c3bb",
-      boxShadow: "0 2px 12px #c4bfb8",
+      borderRadius: 10,
+      overflow: "hidden",
+      border: "1px solid rgba(0,0,0,0.06)",
+      boxShadow: "0 1px 6px rgba(0,0,0,0.06)",
       background: D.ocean,
     }}>
       <svg viewBox={`0 0 ${W} ${H}`} style={{ width: "100%", display: "block" }}>
-        {/* Background */}
+        {/* Ocean background */}
         <rect width={W} height={H} fill={D.ocean} />
 
-        {/* Graticule */}
-        <g stroke="#ccc8c0" strokeWidth="0.5">
-          {[-60,-30,0,30,60].map(lat => {
+        {/* Subtle graticule — only 3 parallels + equator */}
+        <g stroke="rgba(84,99,120,0.07)" strokeWidth="0.5">
+          {[-30, 0, 30].map(lat => {
             const y = (90 - lat) / 180 * H;
             return <line key={lat} x1="0" y1={y} x2={W} y2={y} />;
           })}
-          {[-120,-60,0,60,120].map(lon => {
+          {[-120, -60, 0, 60, 120].map(lon => {
             const x = (lon + 180) / 360 * W;
             return <line key={lon} x1={x} y1="0" x2={x} y2={H} />;
           })}
@@ -173,26 +185,28 @@ function WorldMapStatic() {
         {LAND_PATHS.map((d, i) => (
           <path key={i} d={d}
             fill={D.land} stroke={D.landStroke}
-            strokeWidth="0.6" strokeLinejoin="round" />
+            strokeWidth="0.5" strokeLinejoin="round" />
         ))}
 
-        {/* Connection lines between all countries */}
-        <g stroke="#a8a29a" strokeWidth="0.5">
+        {/* Trade corridor arcs — curvature lifts routes above land */}
+        <g fill="none" stroke={D.dot} strokeWidth="0.75" strokeOpacity="0.28">
           {CONNECTIONS.map(([a, b]) => {
             const [ax, ay] = pos[a];
             const [bx, by] = pos[b];
-            return <line key={`${a}-${b}`} x1={ax} y1={ay} x2={bx} y2={by} />;
+            return (
+              <path key={`${a}-${b}`} d={arcPath(ax, ay, bx, by)} />
+            );
           })}
         </g>
 
-        {/* Country dots */}
+        {/* Country dots — solid, clean */}
         {IDS.map(id => {
           const [cx, cy] = pos[id];
           return (
-            <g key={id}>
-              <circle cx={cx} cy={cy} r="5" fill={D.dot} stroke="#e8e5df" strokeWidth="1.5" />
-              <circle cx={cx} cy={cy} r="2.5" fill="#ffffff" />
-            </g>
+            <circle key={id}
+              cx={cx} cy={cy} r="3.5"
+              fill={D.dot}
+            />
           );
         })}
       </svg>
