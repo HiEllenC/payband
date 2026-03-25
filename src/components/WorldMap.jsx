@@ -129,12 +129,16 @@ function markerPos(id) {
   ];
 }
 
-// All country pairs for connection lines
 const IDS = Object.keys(CAPS);
-const CONNECTIONS = [];
-for (let i = 0; i < IDS.length; i++)
-  for (let j = i + 1; j < IDS.length; j++)
-    CONNECTIONS.push([IDS[i], IDS[j]]);
+
+// Curated corridors: transatlantic, Europe cluster, Gulf-Asia, East Asia hub
+const CONNECTIONS = [
+  ["us","gb"], ["us","ae"], ["us","sg"], ["us","jp"],
+  ["gb","ch"], ["gb","mt"], ["gb","ae"],
+  ["ch","mt"], ["ae","sg"], ["ae","my"],
+  ["sg","hk"], ["sg","my"], ["sg","ph"], ["sg","tw"], ["sg","jp"],
+  ["hk","tw"], ["hk","jp"], ["tw","jp"], ["jp","kr"],
+];
 
 // ── Static decorative map (hero section) ─────────────────────────────────────
 function WorldMapStatic() {
