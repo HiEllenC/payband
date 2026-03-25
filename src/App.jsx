@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, memo } from "react";
 
 // Modules
 import Home from "./modules/Home.jsx";
@@ -38,47 +38,9 @@ const BG = () => (
   </div>
 );
 
-// ═══════ MAIN APP ═══════
-export default function App() {
-  const [tab, setTab] = useState("home");
-  const [selC, setSelC] = useState(["us", "sg", "ae"]);
-  const [selFam, setSelFam] = useState("eng");
-  const [selSub, setSelSub] = useState("be");
-  const [track, setTrack] = useState("ic");
-  const [selLvl, setSelLvl] = useState(2); // default IC3/M3
-  const [usdt, setUsdt] = useState(false);
-  const [lang, setLang] = useState("zh");
-  const [search, setSearch] = useState("");
-  const [detail, setDetail] = useState(null);
-  const [ready, setReady] = useState(false);
-  const [calView, setCalView] = useState("sheet"); // "sheet" or "calendar" or "yearcomp"
-
-  useEffect(() => { setTimeout(() => setReady(true), 60); }, []);
-
-  const t = useCallback((e, z) => lang === "zh" ? z : e, [lang]);
-
-  // Reset subfunction when family changes
-  useEffect(() => {
-    const f = FAMS.find(f => f.id === selFam);
-    if (f && !f.subs.find(s => s.id === selSub)) setSelSub(f.subs[0].id);
-  }, [selFam]);
-
-  const togC = id => setSelC(p => p.includes(id) ? p.filter(x => x !== id) : p.length < 6 ? [...p, id] : p);
-
-  const TABS = [
-    { id: "home",       e: "Home",            z: "首頁" },
-    { id: "salary",     e: "Salary Matrix",   z: "薪資帶寬" },
-    { id: "totalcomp",  e: "Comp Structure",  z: "薪酬結構" },
-    { id: "relocate",   e: "Cross-Border",    z: "跨境調派" },
-    { id: "netpay",     e: "Take-Home",       z: "到手試算" },
-    { id: "markets",    e: "FX & Crypto",     z: "匯率與幣市" },
-    { id: "labor",      e: "Labor Law",       z: "勞動法規" },
-    { id: "calendar",   e: "Holidays",        z: "假日行事曆" },
-    { id: "regulation", e: "Reg Tracker",     z: "監管動態" },
-    { id: "countries",  e: "Country Files",   z: "國家檔案" },
-  ];
-
-  const Header = () => (
+// ═══════ HEADER (module-level to prevent remount on every App render) ═══════
+const AppHeader = memo(function AppHeader({ tab, setTab, setDetail, usdt, setUsdt, lang, setLang, t, TABS }) {
+  return (
     <header style={{ position: "sticky", top: 0, zIndex: 100, background: "rgba(240,238,234,0.75)", backdropFilter: "blur(24px)", borderBottom: `1px solid rgba(0,0,0,0.04)` }}>
       <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", maxWidth: 1360, margin: "0 auto", height: 58, padding: "0 28px" }}>
         <div style={{ display: "flex", alignItems: "center", gap: 6, cursor: "pointer" }} onClick={() => { setTab("home"); setDetail(null); }}>
@@ -113,6 +75,47 @@ export default function App() {
       </div>
     </header>
   );
+});
+
+// ═══════ MAIN APP ═══════
+export default function App() {
+  const [tab, setTab] = useState("home");
+  const [selC, setSelC] = useState(["us", "sg", "ae"]);
+  const [selFam, setSelFam] = useState("eng");
+  const [selSub, setSelSub] = useState("be");
+  const [track, setTrack] = useState("ic");
+  const [selLvl, setSelLvl] = useState(2); // default IC3/M3
+  const [usdt, setUsdt] = useState(false);
+  const [lang, setLang] = useState("zh");
+  const [search, setSearch] = useState("");
+  const [detail, setDetail] = useState(null);
+  const [ready, setReady] = useState(false);
+  const [calView, setCalView] = useState("sheet"); // "sheet" or "calendar" or "yearcomp"
+
+  useEffect(() => { const id = setTimeout(() => setReady(true), 60); return () => clearTimeout(id); }, []);
+
+  const t = useCallback((e, z) => lang === "zh" ? z : e, [lang]);
+
+  // Reset subfunction when family changes (selSub included in deps to avoid stale closure)
+  useEffect(() => {
+    const f = FAMS.find(f => f.id === selFam);
+    if (f && !f.subs.find(s => s.id === selSub)) setSelSub(f.subs[0].id);
+  }, [selFam, selSub]);
+
+  const togC = id => setSelC(p => p.includes(id) ? p.filter(x => x !== id) : p.length < 6 ? [...p, id] : p);
+
+  const TABS = [
+    { id: "home",       e: "Home",            z: "首頁" },
+    { id: "salary",     e: "Salary Matrix",   z: "薪資帶寬" },
+    { id: "totalcomp",  e: "Comp Structure",  z: "薪酬結構" },
+    { id: "relocate",   e: "Cross-Border",    z: "跨境調派" },
+    { id: "netpay",     e: "Take-Home",       z: "到手試算" },
+    { id: "markets",    e: "FX & Crypto",     z: "匯率與幣市" },
+    { id: "labor",      e: "Labor Law",       z: "勞動法規" },
+    { id: "calendar",   e: "Holidays",        z: "假日行事曆" },
+    { id: "regulation", e: "Reg Tracker",     z: "監管動態" },
+    { id: "countries",  e: "Country Files",   z: "國家檔案" },
+  ];
 
   const sharedJobProps = {
     selFam, setSelFam, selSub, setSelSub, track, setTrack, selLvl, setSelLvl,
@@ -121,12 +124,11 @@ export default function App() {
   return (
     <div style={{ minHeight: "100vh", color: D.tx, position: "relative", fontFamily: "'DM Mono','Noto Sans TC',monospace", fontSize: 16 }}>
       <style>{`
-        @import url('https://fonts.googleapis.com/css2?family=DM+Mono:wght@300;400;500&family=Noto+Sans+TC:wght@300;400;500;700&display=swap');
-        *{box-sizing:border-box;margin:0;padding:0}::selection{background:${D.slate}18}::-webkit-scrollbar{width:5px;height:5px}::-webkit-scrollbar-track{background:transparent}::-webkit-scrollbar-thumb{background:rgba(0,0,0,0.1);border-radius:4px}input::placeholder{color:${D.tx4}}table tr:hover{background:${D.slate}03!important}button{font-family:inherit}
+*{box-sizing:border-box;margin:0;padding:0}::selection{background:${D.slate}18}::-webkit-scrollbar{width:5px;height:5px}::-webkit-scrollbar-track{background:transparent}::-webkit-scrollbar-thumb{background:rgba(0,0,0,0.1);border-radius:4px}input::placeholder{color:${D.tx4}}table tr:hover{background:${D.slate}03!important}button{font-family:inherit}
       `}</style>
       <BG />
       <div style={{ position: "relative", zIndex: 1 }}>
-        <Header />
+        <AppHeader tab={tab} setTab={setTab} setDetail={setDetail} usdt={usdt} setUsdt={setUsdt} lang={lang} setLang={setLang} t={t} TABS={TABS} />
         <main style={{ maxWidth: 1360, margin: "0 auto", padding: "20px 32px 48px" }}>
           {tab === "home" && (
             <Home selC={selC} togC={togC} setTab={setTab} ready={ready} t={t} />
