@@ -165,41 +165,42 @@ function WorldMapStatic() {
         ))}
 
         {/* Country markers */}
-        {Object.keys(CAPS).map(id => {
+        {Object.keys(CAPS).map((id, i) => {
           const [cx, cy] = markerPos(id);
-          const anch = ANCHOR[id] === "right";
-          const lx   = anch ? cx + 11 : cx - 11;
           const pulse = PULSE_IDS.has(id);
           const dotColor = pulse ? D.dotPulse : D.dot;
+          const delay = (i * 0.4).toFixed(1) + "s";
 
           return (
             <g key={id}>
-              {/* Pulse ring on 3 highlighted dots */}
+              {/* Outer glow ring */}
+              <circle cx={cx} cy={cy} r="8"
+                fill={dotColor} opacity="0.10" />
+              {/* Pulse ring */}
               {pulse && (
-                <circle cx={cx} cy={cy} r="4" fill="none"
-                  stroke={D.dotPulse} strokeWidth="1" opacity="0.5">
-                  <animate attributeName="r" values="4;13;4" dur="2.8s" repeatCount="indefinite" />
-                  <animate attributeName="opacity" values="0.5;0;0.5" dur="2.8s" repeatCount="indefinite" />
+                <circle cx={cx} cy={cy} r="5" fill="none"
+                  stroke={D.dotPulse} strokeWidth="0.8" opacity="0">
+                  <animate attributeName="r" values="5;16;5" dur="3s" begin={delay} repeatCount="indefinite" />
+                  <animate attributeName="opacity" values="0.45;0;0.45" dur="3s" begin={delay} repeatCount="indefinite" />
                 </circle>
               )}
-              {/* Dot */}
-              <circle cx={cx} cy={cy} r="4"
+              {/* Inner dot */}
+              <circle cx={cx} cy={cy} r="3.5"
                 fill={dotColor}
-                stroke="rgba(255,255,255,0.5)" strokeWidth="1"
+                stroke="rgba(255,255,255,0.6)" strokeWidth="1"
               />
-              {/* Country code label */}
-              <text
-                x={lx} y={cy + 4}
-                textAnchor={anch ? "start" : "end"}
-                fontSize="8" fontFamily={FONT} fontWeight="500"
-                fill={D.dotLabel}
-                style={{ pointerEvents: "none", userSelect: "none" }}
-              >
-                {CODE[id]}
-              </text>
             </g>
           );
         })}
+
+        {/* Vignette overlay for depth */}
+        <defs>
+          <radialGradient id="vig" cx="50%" cy="50%" r="50%">
+            <stop offset="60%" stopColor="transparent" />
+            <stop offset="100%" stopColor={D.ocean} stopOpacity="0.5" />
+          </radialGradient>
+        </defs>
+        <rect width={W} height={H} fill="url(#vig)" />
       </svg>
     </div>
   );
