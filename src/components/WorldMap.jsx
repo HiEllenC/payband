@@ -66,16 +66,25 @@ const LAND_PATHS = LANDMASSES.map(makePath);
 
 // ── Design tokens ────────────────────────────────────────────────────────────
 const D = {
-  ocean:      "#18263a",          // deep navy
-  land:       "#2c3e52",          // dark slate
-  landStroke: "#38516a",          // land border
-  selected:   "#7ab8d9",          // sky blue accent
+  // Static map (hero) — warm light palette matching page
+  ocean:      "#e8e5df",          // warm beige (matches page bg)
+  land:       "#d0cbc3",          // warm tan landmass
+  landStroke: "#c4bfb7",          // subtle land border
+  dot:        "#546378",          // slate (site primary)
+  dotLabel:   "rgba(84,99,120,0.65)",
+  dotPulse:   "#5f7a61",          // sage accent for pulse dots
+  grid:       "rgba(84,99,120,0.06)",
+  // Interactive map (other modules) — dark palette
+  selected:   "#7ab8d9",
   selRing:    "rgba(122,184,217,0.22)",
-  hov:        "#d4956a",          // warm amber
+  hov:        "#d4956a",
   hovRing:    "rgba(212,149,106,0.20)",
-  neutral:    "#4a6478",          // muted steel
+  neutral:    "#4a6478",
   dotStroke:  "rgba(255,255,255,0.18)",
-  grid:       "rgba(255,255,255,0.07)",
+  gridDark:   "rgba(255,255,255,0.07)",
+  ocean_dark: "#18263a",
+  land_dark:  "#2c3e52",
+  landStroke_dark: "#38516a",
   hudText:    "rgba(180,200,218,0.55)",
   hudSub:     "rgba(140,165,188,0.35)",
   pillBg:     "rgba(122,184,217,0.12)",
@@ -127,17 +136,17 @@ const PULSE_IDS = new Set(["us", "ae", "sg"]);
 function WorldMapStatic() {
   return (
     <div style={{
-      borderRadius: 10, overflow: "hidden",
-      border: "1px solid rgba(56,81,106,0.6)",
-      boxShadow: "0 4px 32px rgba(0,0,0,0.28)",
+      borderRadius: 12, overflow: "hidden",
+      border: "1px solid rgba(0,0,0,0.06)",
+      boxShadow: "0 2px 16px rgba(0,0,0,0.07)",
       background: D.ocean,
     }}>
       <svg viewBox={`0 0 ${W} ${H}`} style={{ width: "100%", display: "block" }}>
-        {/* Ocean */}
+        {/* Background */}
         <rect width={W} height={H} fill={D.ocean} />
 
-        {/* Graticule */}
-        <g stroke={D.grid} strokeWidth="0.5">
+        {/* Subtle graticule */}
+        <g stroke={D.grid} strokeWidth="0.7">
           {[-60,-30,0,30,60].map(lat => {
             const y = (90 - lat) / 180 * H;
             return <line key={lat} x1="0" y1={y} x2={W} y2={y} />;
@@ -148,45 +157,42 @@ function WorldMapStatic() {
           })}
         </g>
 
-        {/* Equator label */}
-        <text x="6" y={(90 / 180) * H - 3}
-          fontSize="7" fill="rgba(255,255,255,0.15)" fontFamily={FONT}>0°</text>
-
         {/* Landmasses */}
         {LAND_PATHS.map((d, i) => (
           <path key={i} d={d}
             fill={D.land} stroke={D.landStroke}
-            strokeWidth="0.5" strokeLinejoin="round" />
+            strokeWidth="0.6" strokeLinejoin="round" />
         ))}
 
-        {/* Country markers — all static, same accent color */}
+        {/* Country markers */}
         {Object.keys(CAPS).map(id => {
           const [cx, cy] = markerPos(id);
           const anch = ANCHOR[id] === "right";
           const lx   = anch ? cx + 11 : cx - 11;
           const pulse = PULSE_IDS.has(id);
+          const dotColor = pulse ? D.dotPulse : D.dot;
 
           return (
             <g key={id}>
-              {/* Pulse ring on select dots */}
+              {/* Pulse ring on 3 highlighted dots */}
               {pulse && (
                 <circle cx={cx} cy={cy} r="4" fill="none"
-                  stroke={D.selected} strokeWidth="1">
-                  <animate attributeName="r" values="4;14;4" dur="3s" repeatCount="indefinite" />
-                  <animate attributeName="opacity" values="0.6;0;0.6" dur="3s" repeatCount="indefinite" />
+                  stroke={D.dotPulse} strokeWidth="1" opacity="0.5">
+                  <animate attributeName="r" values="4;13;4" dur="2.8s" repeatCount="indefinite" />
+                  <animate attributeName="opacity" values="0.5;0;0.5" dur="2.8s" repeatCount="indefinite" />
                 </circle>
               )}
               {/* Dot */}
-              <circle cx={cx} cy={cy} r="4.5"
-                fill={D.selected}
-                stroke="rgba(255,255,255,0.2)" strokeWidth="1"
+              <circle cx={cx} cy={cy} r="4"
+                fill={dotColor}
+                stroke="rgba(255,255,255,0.5)" strokeWidth="1"
               />
-              {/* Code label */}
+              {/* Country code label */}
               <text
                 x={lx} y={cy + 4}
                 textAnchor={anch ? "start" : "end"}
-                fontSize="8.5" fontFamily={FONT} fontWeight="500"
-                fill="rgba(122,184,217,0.75)"
+                fontSize="8" fontFamily={FONT} fontWeight="500"
+                fill={D.dotLabel}
                 style={{ pointerEvents: "none", userSelect: "none" }}
               >
                 {CODE[id]}
@@ -213,16 +219,16 @@ export default function WorldMap({ selected, onSelect, countries = COUNTRIES, t:
       borderRadius: 10, overflow: "hidden",
       border: "1px solid rgba(56,81,106,0.6)",
       boxShadow: "0 4px 32px rgba(0,0,0,0.28)",
-      background: D.ocean,
+      background: D.ocean_dark,
     }}>
       {/* ── SVG Map ── */}
       <div style={{ position: "relative" }}>
         <svg viewBox={`0 0 ${W} ${H}`} style={{ width: "100%", display: "block" }}>
           {/* Ocean */}
-          <rect width={W} height={H} fill={D.ocean} />
+          <rect width={W} height={H} fill={D.ocean_dark} />
 
           {/* Graticule */}
-          <g stroke={D.grid} strokeWidth="0.5">
+          <g stroke={D.gridDark} strokeWidth="0.5">
             {[-60,-30,0,30,60].map(lat => {
               const y = (90 - lat) / 180 * H;
               return <line key={lat} x1="0" y1={y} x2={W} y2={y} />;
@@ -240,7 +246,7 @@ export default function WorldMap({ selected, onSelect, countries = COUNTRIES, t:
           {/* Landmasses */}
           {LAND_PATHS.map((d, i) => (
             <path key={i} d={d}
-              fill={D.land} stroke={D.landStroke}
+              fill={D.land_dark} stroke={D.landStroke_dark}
               strokeWidth="0.5" strokeLinejoin="round" />
           ))}
 
