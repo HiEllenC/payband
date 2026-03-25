@@ -129,24 +129,32 @@ function markerPos(id) {
   ];
 }
 
-// Dots that get a subtle SVG pulse animation
-const PULSE_IDS = new Set(["us", "ae", "sg"]);
+// All country pairs for connection lines
+const IDS = Object.keys(CAPS);
+const CONNECTIONS = [];
+for (let i = 0; i < IDS.length; i++)
+  for (let j = i + 1; j < IDS.length; j++)
+    CONNECTIONS.push([IDS[i], IDS[j]]);
 
 // ── Static decorative map (hero section) ─────────────────────────────────────
 function WorldMapStatic() {
+  // Pre-compute positions
+  const pos = {};
+  IDS.forEach(id => { pos[id] = markerPos(id); });
+
   return (
     <div style={{
       borderRadius: 12, overflow: "hidden",
-      border: "1px solid rgba(0,0,0,0.06)",
-      boxShadow: "0 2px 16px rgba(0,0,0,0.07)",
+      border: "1px solid #c8c3bb",
+      boxShadow: "0 2px 12px #c4bfb8",
       background: D.ocean,
     }}>
       <svg viewBox={`0 0 ${W} ${H}`} style={{ width: "100%", display: "block" }}>
         {/* Background */}
         <rect width={W} height={H} fill={D.ocean} />
 
-        {/* Subtle graticule */}
-        <g stroke={D.grid} strokeWidth="0.7">
+        {/* Graticule */}
+        <g stroke="#ccc8c0" strokeWidth="0.5">
           {[-60,-30,0,30,60].map(lat => {
             const y = (90 - lat) / 180 * H;
             return <line key={lat} x1="0" y1={y} x2={W} y2={y} />;
@@ -164,43 +172,25 @@ function WorldMapStatic() {
             strokeWidth="0.6" strokeLinejoin="round" />
         ))}
 
-        {/* Country markers */}
-        {Object.keys(CAPS).map((id, i) => {
-          const [cx, cy] = markerPos(id);
-          const pulse = PULSE_IDS.has(id);
-          const dotColor = pulse ? D.dotPulse : D.dot;
-          const delay = (i * 0.4).toFixed(1) + "s";
+        {/* Connection lines between all countries */}
+        <g stroke="#a8a29a" strokeWidth="0.5">
+          {CONNECTIONS.map(([a, b]) => {
+            const [ax, ay] = pos[a];
+            const [bx, by] = pos[b];
+            return <line key={`${a}-${b}`} x1={ax} y1={ay} x2={bx} y2={by} />;
+          })}
+        </g>
 
+        {/* Country dots */}
+        {IDS.map(id => {
+          const [cx, cy] = pos[id];
           return (
             <g key={id}>
-              {/* Outer glow ring */}
-              <circle cx={cx} cy={cy} r="8"
-                fill={dotColor} opacity="0.10" />
-              {/* Pulse ring */}
-              {pulse && (
-                <circle cx={cx} cy={cy} r="5" fill="none"
-                  stroke={D.dotPulse} strokeWidth="0.8" opacity="0">
-                  <animate attributeName="r" values="5;16;5" dur="3s" begin={delay} repeatCount="indefinite" />
-                  <animate attributeName="opacity" values="0.45;0;0.45" dur="3s" begin={delay} repeatCount="indefinite" />
-                </circle>
-              )}
-              {/* Inner dot */}
-              <circle cx={cx} cy={cy} r="3.5"
-                fill={dotColor}
-                stroke="rgba(255,255,255,0.6)" strokeWidth="1"
-              />
+              <circle cx={cx} cy={cy} r="5" fill={D.dot} stroke="#e8e5df" strokeWidth="1.5" />
+              <circle cx={cx} cy={cy} r="2.5" fill="#ffffff" />
             </g>
           );
         })}
-
-        {/* Vignette overlay for depth */}
-        <defs>
-          <radialGradient id="vig" cx="50%" cy="50%" r="50%">
-            <stop offset="60%" stopColor="transparent" />
-            <stop offset="100%" stopColor={D.ocean} stopOpacity="0.5" />
-          </radialGradient>
-        </defs>
-        <rect width={W} height={H} fill="url(#vig)" />
       </svg>
     </div>
   );
