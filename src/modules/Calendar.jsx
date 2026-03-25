@@ -1,6 +1,5 @@
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import Card from "../components/Card.jsx";
-import WorldMap from "../components/WorldMap.jsx";
 import { COUNTRIES } from "../data/countries.js";
 import { HOLIDAYS_DB, WEEKENDS } from "../data/holidays.js";
 
@@ -85,19 +84,29 @@ export default function Calendar({ selC, togC, calView, setCalView, lang, t }) {
     return count;
   };
   const getAnnualHolidays = (cid, yr) => ((HOLIDAYS_DB[yr] || {})[cid] || []).length;
-  const getAnnualWorkDays = (cid, yr) => {
-    const hdb = (HOLIDAYS_DB[yr] || {})[cid] || [];
-    let count = 0;
-    for (let m = 0; m < 12; m++) {
-      const dim = new Date(yr, m + 1, 0).getDate();
-      for (let d = 1; d <= dim; d++) {
-        const dow = new Date(yr, m, d).getDay();
-        const wknd = (WEEKENDS[cid] || [0, 6]).includes(dow);
-        const hol = hdb.some(h => h.m === m + 1 && h.d === d);
-        if (!wknd && !hol) count++;
+  // Memoize annual work-day calculations — avoids re-creating 365+ Date objects per render
+  const annualWorkDaysCache = useMemo(() => {
+    const cache = {};
+    for (const yr of availYears) {
+      for (const c of COUNTRIES) {
+        const hdb = (HOLIDAYS_DB[yr] || {})[c.id] || [];
+        const holSet = new Set(hdb.map(h => `${h.m}-${h.d}`));
+        let count = 0;
+        for (let m = 0; m < 12; m++) {
+          const dim = new Date(yr, m + 1, 0).getDate();
+          for (let d = 1; d <= dim; d++) {
+            const dow = new Date(yr, m, d).getDay();
+            const wknd = (WEEKENDS[c.id] || [0, 6]).includes(dow);
+            if (!wknd && !holSet.has(`${m + 1}-${d}`)) count++;
+          }
+        }
+        cache[`${c.id}-${yr}`] = count;
       }
     }
-    return count;
+    return cache;
+  }, []); // availYears and COUNTRIES are module-level constants
+  const getAnnualWorkDays = (cid, yr) => {
+    return annualWorkDaysCache[`${cid}-${yr}`] ?? 0;
   };
 
   return (
@@ -124,7 +133,27 @@ export default function Calendar({ selC, togC, calView, setCalView, lang, t }) {
         ))}
       </div>
 
-      <WorldMap selected={selC} onSelect={togC} t={t} />
+      {/* Country selector */}
+      <div style={{ display: "flex", flexWrap: "wrap", gap: 8, marginBottom: 16 }}>
+        {COUNTRIES.map(c => {
+          const active = selC.includes(c.id);
+          return (
+            <button key={c.id} onClick={() => togC(c.id)} style={{
+              display: "flex", alignItems: "center", gap: 7,
+              padding: "7px 14px", borderRadius: 7, cursor: "pointer",
+              border: active ? "1.5px solid #546378" : "1.5px solid rgba(0,0,0,0.08)",
+              background: active ? "#546378" : "#faf9f7",
+              color: active ? "#fff" : "#4a4a52",
+              fontSize: 13, fontWeight: active ? 600 : 400,
+              fontFamily: "'DM Mono','Noto Sans TC',monospace",
+              transition: "all 0.15s",
+            }}>
+              <span style={{ fontSize: 16 }}>{c.flag}</span>
+              {t(c.n, c.zh)}
+            </button>
+          );
+        })}
+      </div>
 
       {/* Year + Month selector */}
       <Card glow style={{ marginBottom: 14 }}>
