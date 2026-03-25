@@ -1,5 +1,4 @@
 import Card from "../components/Card.jsx";
-import WorldMap from "../components/WorldMap.jsx";
 import { COUNTRIES } from "../data/countries.js";
 
 const D = {
@@ -97,7 +96,28 @@ export default function LaborLaw({ selC, togC, lang, t }) {
         ))}
       </div>
 
-      <WorldMap selected={selC} onSelect={togC} t={t} />
+      {/* Country selector */}
+      <div style={{ display: "flex", flexWrap: "wrap", gap: 8, marginBottom: 12 }}>
+        {COUNTRIES.map(c => {
+          const active = selC.includes(c.id);
+          return (
+            <button key={c.id} onClick={() => togC(c.id)} style={{
+              display: "flex", alignItems: "center", gap: 7,
+              padding: "7px 14px", borderRadius: 7, cursor: "pointer",
+              border: active ? `1.5px solid ${D.slate}` : "1.5px solid rgba(0,0,0,0.08)",
+              background: active ? D.slate : D.surface,
+              color: active ? "#fff" : D.tx2,
+              fontSize: 13, fontWeight: active ? 600 : 400,
+              fontFamily: "'DM Mono','Noto Sans TC',monospace",
+              transition: "all 0.15s",
+            }}>
+              <span style={{ fontSize: 16 }}>{c.flag}</span>
+              {t(c.n, c.zh)}
+            </button>
+          );
+        })}
+      </div>
+
       <Card glow style={{ marginTop: 12 }}>
         <div style={{ overflowX: "auto" }}>
           <table style={{ width: "100%", borderCollapse: "collapse" }}>
