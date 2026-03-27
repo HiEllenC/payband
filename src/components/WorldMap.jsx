@@ -66,14 +66,14 @@ const LAND_PATHS = LANDMASSES.map(makePath);
 
 // ── Design tokens ────────────────────────────────────────────────────────────
 const D = {
-  // Static map (hero) — warm light palette matching page
-  ocean:      "#e8e5df",          // warm beige (matches page bg)
-  land:       "#d0cbc3",          // warm tan landmass
-  landStroke: "#c4bfb7",          // subtle land border
-  dot:        "#546378",          // slate (site primary)
-  dotLabel:   "rgba(84,99,120,0.65)",
-  dotPulse:   "#5f7a61",          // sage accent for pulse dots
-  grid:       "rgba(84,99,120,0.06)",
+  // Static map (hero) — cool blue-grey palette matching Scheme B
+  ocean:      "#eaf0f8",          // light blue-grey ocean
+  land:       "#c8d4e6",          // muted blue-grey landmass
+  landStroke: "#b8c6db",          // subtle land border
+  dot:        "#1a56db",          // slate primary blue
+  dotLabel:   "rgba(26,86,219,0.65)",
+  dotPulse:   "#f59e0b",          // copper amber accent
+  grid:       "rgba(26,86,219,0.06)",
   // Interactive map (other modules) — dark palette
   selected:   "#7ab8d9",
   selRing:    "rgba(122,184,217,0.22)",
@@ -161,8 +161,8 @@ function WorldMapStatic() {
     <div style={{
       borderRadius: 10,
       overflow: "hidden",
-      border: "1px solid rgba(0,0,0,0.06)",
-      boxShadow: "0 1px 6px rgba(0,0,0,0.06)",
+      border: "1px solid rgba(26,86,219,0.12)",
+      boxShadow: "0 2px 12px rgba(26,86,219,0.08)",
       background: D.ocean,
     }}>
       <svg viewBox={`0 0 ${W} ${H}`} style={{ width: "100%", display: "block" }}>
@@ -188,27 +188,6 @@ function WorldMapStatic() {
             strokeWidth="0.5" strokeLinejoin="round" />
         ))}
 
-        {/* Trade corridor arcs — curvature lifts routes above land */}
-        <g fill="none" stroke={D.dot} strokeWidth="0.75" strokeOpacity="0.28">
-          {CONNECTIONS.map(([a, b]) => {
-            const [ax, ay] = pos[a];
-            const [bx, by] = pos[b];
-            return (
-              <path key={`${a}-${b}`} d={arcPath(ax, ay, bx, by)} />
-            );
-          })}
-        </g>
-
-        {/* Country dots — solid, clean */}
-        {IDS.map(id => {
-          const [cx, cy] = pos[id];
-          return (
-            <circle key={id}
-              cx={cx} cy={cy} r="3.5"
-              fill={D.dot}
-            />
-          );
-        })}
       </svg>
     </div>
   );
