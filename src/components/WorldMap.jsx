@@ -362,7 +362,12 @@ function markerPos(id) {
 const IDS = Object.keys(CAPS);
 
 // ── Hero interactive map ──────────────────────────────────────────────────────
-export function WorldMapHero({ lang = "zh" }) {
+// Crop polar dead-zones: show lat 65°N → 50°S only
+const HERO_TOP    = (90 - 65)  / 180 * H;   // y ≈  61
+const HERO_BOTTOM = (90 - (-50)) / 180 * H; // y ≈ 344
+const HERO_VH     = HERO_BOTTOM - HERO_TOP; // ≈ 283
+
+export function WorldMapHero({ lang = "zh", fill = false }) {
   const [hov, setHov] = useState(null);
 
   const circleXY = (lon, lat) => [
@@ -388,20 +393,25 @@ export function WorldMapHero({ lang = "zh" }) {
   };
 
   return (
-    <div style={{ width: "100%" }}>
-      <svg viewBox={`0 0 ${W} ${H}`} style={{ width: "100%", display: "block" }}>
+    <div style={fill ? { position: "absolute", inset: 0 } : { width: "100%" }}>
+      <svg
+        viewBox={`0 ${HERO_TOP} ${W} ${HERO_VH}`}
+        preserveAspectRatio={fill ? "xMidYMid slice" : "xMidYMid meet"}
+        style={fill ? { width: "100%", height: "100%", display: "block" } : { width: "100%", display: "block" }}
+      >
         {/* Transparent ocean */}
-        <rect width={W} height={H} fill="transparent" />
+        <rect x="0" y={HERO_TOP} width={W} height={HERO_VH} fill="transparent" />
 
         {/* Subtle graticule */}
         <g stroke="rgba(84,99,120,0.06)" strokeWidth="0.5">
           {[-30, 0, 30].map(lat => {
             const y = (90 - lat) / 180 * H;
+            if (y < HERO_TOP || y > HERO_BOTTOM) return null;
             return <line key={lat} x1="0" y1={y} x2={W} y2={y} />;
           })}
           {[-120, -60, 0, 60, 120].map(lon => {
             const x = (lon + 180) / 360 * W;
-            return <line key={lon} x1={x} y1="0" x2={x} y2={H} />;
+            return <line key={lon} x1={x} y1={HERO_TOP} x2={x} y2={HERO_BOTTOM} />;
           })}
         </g>
 
@@ -462,7 +472,7 @@ export function WorldMapHero({ lang = "zh" }) {
               textAnchor="middle" dominantBaseline="middle"
               fontSize={isH ? "10" : "8.5"}
               fontFamily={FONT} fontWeight={isH ? "700" : "600"}
-              fill={isH ? "#fff" : D.pbDefault}
+              fill={isH ? "#fff" : "#6b8fad"}
               style={{ pointerEvents: "none", userSelect: "none", transition: "all 0.15s ease" }}
             >
               {code}

@@ -46,7 +46,7 @@ const AppHeader = memo(function AppHeader({ tab, setTab, setDetail, usdt, setUsd
       <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", maxWidth: 1360, margin: "0 auto", height: 58, padding: "0 28px" }}>
         <div style={{ display: "flex", alignItems: "center", gap: 6, cursor: "pointer" }} onClick={() => { setTab("home"); setDetail(null); }}>
           <span style={{ fontSize: 20, fontWeight: 700, fontFamily: "'DM Mono',monospace", color: D.ink, letterSpacing: 2 }}>
-            Pay<span style={{ color: D.slate }}>band</span>
+            i<span style={{ color: D.slate }}>Pay</span>band
           </span>
         </div>
         <nav style={{ display: "flex", gap: 1, overflowX: "auto", msOverflowStyle: "none", scrollbarWidth: "none", flex: 1, margin: "0 16px" }}>

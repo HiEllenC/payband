@@ -52,7 +52,7 @@ export default function Home({ selC, togC, setTab, ready, t, lang = "zh" }) {
             </button>
           </div>
         </div>
-        <div style={{ opacity: ready ? 1 : 0, transform: ready ? "translateX(0)" : "translateX(20px)", transition: "all 0.8s cubic-bezier(.22,1,.36,1) 0.2s" }}>
+        <div style={{ opacity: ready ? 1 : 0, transform: ready ? "translateX(0)" : "translateX(20px)", transition: "all 0.8s cubic-bezier(.22,1,.36,1) 0.2s", display: "flex", alignItems: "center" }}>
           <WorldMapHero lang={lang} />
         </div>
       </div>
