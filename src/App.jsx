@@ -161,7 +161,7 @@ export default function App() {
             />
           )}
           {tab === "relocate" && (
-            <Relocation lang={lang} t={t} />
+            <Relocation lang={lang} t={t} {...sharedJobProps} />
           )}
           {tab === "markets" && (
             <Markets lang={lang} t={t} usdt={usdt} />

@@ -480,8 +480,8 @@ export default function GrossToNet({ lang, t }) {
           </table>
         </div>
         <div style={{ padding: "10px 16px", borderTop: `1px solid ${D.lnF}`, fontSize: 11, color: D.tx4, lineHeight: 1.5 }}>
-          ⚠️ {t("Simplified models using 2024 rates. Does not include all deductions, credits, or surcharges. UAE has 0% income tax with no social security for foreign employees. Consult a tax professional for actual payroll planning.",
-               "基於 2024 年稅率的簡化模型，未包含所有扣除額、抵稅額或附加稅。阿聯酋外籍員工享有0%所得稅且無社保。實際薪資規劃請諮詢稅務專業人士。")}
+          ⚠️ {t("Simplified models using 2025/2026 rates. Does not include all deductions, credits, or surcharges. UAE has 0% income tax with no social security for foreign employees. Consult a tax professional for actual payroll planning.",
+               "基於 2025/2026 年稅率的簡化模型，未包含所有扣除額、抵稅額或附加稅。阿聯酋外籍員工享有0%所得稅且無社保。實際薪資規劃請諮詢稅務專業人士。")}
         </div>
         <div style={{ padding: "10px 16px", borderTop: `1px solid ${D.lnF}`, fontSize: 12, color: D.sage, lineHeight: 1.6, background: "rgba(5,150,105,0.04)" }}>
           💡 {t(

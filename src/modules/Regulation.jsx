@@ -182,7 +182,7 @@ export default function Regulation({ lang, t }) {
 
           <Card glow>
             <div style={{ padding: "16px 20px" }}>
-              {filtered.map((ev, i) => {
+              {[...filtered].reverse().map((ev, i) => {
                 const cc = COUNTRIES.find(c => c.id === ev.cid);
                 const tp = typeMap[ev.type] || typeMap.P;
                 const imp = impactMap[ev.impact] || impactMap.low;

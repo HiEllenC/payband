@@ -69,7 +69,7 @@ function BandCell({ band, actual, color, usdt, lvlId, lang }) {
         )}
       </div>
       {/* P25 / P75 labels — always visible, deepen on hover */}
-      <div style={{ display: "flex", justifyContent: "space-between", fontSize: 10, color: hov ? "#6b7280" : "#c4c9d4", fontFamily: "'DM Mono',monospace", transition: "color 0.15s" }}>
+      <div style={{ display: "flex", justifyContent: "space-between", fontSize: 10, color: hov ? "#6b7280" : "#8a9ab0", fontFamily: "'DM Mono',monospace", transition: "color 0.15s" }}>
         <span>{fmt(band.p25, usdt)}</span>
         <span>{fmt(band.p75, usdt)}</span>
       </div>

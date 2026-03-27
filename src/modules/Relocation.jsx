@@ -29,7 +29,7 @@ const EFF_RATE = {
 
 // Employer social security rate
 const ER_RATE = {
-  us: 0.0765, gb: 0.138, ch: 0.13, mt: 0.10, ae: 0.125,
+  us: 0.0765, gb: 0.138, ch: 0.13, mt: 0.10, ae: 0.00,
   sg: 0.17, hk: 0.05, jp: 0.145, kr: 0.10, tw: 0.18, ph: 0.095, my: 0.15,
 };
 
@@ -96,23 +96,19 @@ const TRACKS = [
   { id: "ic", zh: "IC", en: "IC" },
   { id: "mgmt", zh: "管理", en: "Mgmt" },
 ];
-const LEVELS = [1, 2, 3, 4, 5];
+const LEVELS = [0, 1, 2, 3, 4];
 
-export default function Relocation({ lang, t }) {
+export default function Relocation({ lang, t, selFam, setSelFam, selSub, setSelSub, track, setTrack, selLvl, setSelLvl }) {
   const [fromId, setFromId] = useState("tw");
   const [toId,   setToId]   = useState("sg");
-  const [selFam, setSelFam] = useState("eng");
-  const [selSub, setSelSub] = useState("be");
-  const [track,  setTrack]  = useState("ic");
-  const [selLvl, setSelLvl] = useState(3);
   const [showAll, setShowAll] = useState(false);
 
   const fromC = COUNTRIES.find(c => c.id === fromId);
   const toC   = COUNTRIES.find(c => c.id === toId);
   const tc_to = TC[toId] || {};
 
-  const fromSal = gS(fromId, selFam, selSub, track, selLvl - 1); // K (selLvl is 1-based display)
-  const toSal   = gS(toId,   selFam, selSub, track, selLvl - 1); // K
+  const fromSal = gS(fromId, selFam, selSub, track, selLvl); // K (selLvl is 1-based display)
+  const toSal   = gS(toId,   selFam, selSub, track, selLvl); // K
 
   const fromGross   = fromSal * 1000;
   const toGross     = toSal   * 1000;
@@ -270,7 +266,7 @@ export default function Relocation({ lang, t }) {
                   <div style={{ display: "flex", gap: 4 }}>
                     {LEVELS.map(l => (
                       <Btn key={l} active={selLvl === l} onClick={() => setSelLvl(l)}>
-                        {track === "ic" ? `IC${l}` : `M${l}`}
+                        {track === "ic" ? `IC${l+1}` : `M${l+1}`}
                       </Btn>
                     ))}
                   </div>

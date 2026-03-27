@@ -100,7 +100,7 @@ export default function LaborLaw({ selC, togC, lang, t }) {
       </div>
 
       {/* Country selector */}
-      <div style={{ display: "flex", flexWrap: "wrap", gap: 8, marginBottom: 12 }}>
+      <div style={{ display: "flex", flexWrap: "wrap", gap: 8, marginBottom: 12, alignItems: "center" }}>
         {COUNTRIES.map(c => {
           const active = selC.includes(c.id);
           return (
@@ -119,6 +119,18 @@ export default function LaborLaw({ selC, togC, lang, t }) {
             </button>
           );
         })}
+        {selC.length > 0 && (
+          <button onClick={() => selC.forEach(id => togC(id))} style={{
+            padding: "7px 14px", borderRadius: 7, cursor: "pointer",
+            border: "1.5px solid rgba(220,38,38,0.3)",
+            background: "rgba(220,38,38,0.05)",
+            color: "#dc2626",
+            fontSize: 13, fontFamily: "'DM Mono','Noto Sans TC',monospace",
+            transition: "all 0.15s",
+          }}>
+            {t("✕ Clear", "✕ 清空")}
+          </button>
+        )}
       </div>
 
       <Card glow style={{ marginTop: 12 }}>
