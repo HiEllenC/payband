@@ -8,19 +8,19 @@ import { gS, fmt } from "../utils/salary.js";
 import VestingSim from "./VestingSim.jsx";
 
 const D = {
-  tx: "#1c1c1f",
-  tx2: "#4a4a52",
-  tx3: "#7d7d88",
-  tx4: "#a8a8b4",
-  lnF: "rgba(0,0,0,0.03)",
-  ln: "rgba(0,0,0,0.06)",
-  ink: "#2d3142",
-  slate: "#546378",
-  sage: "#5f7a61",
-  copper: "#96714a",
-  clay: "#a06b52",
-  wine: "#8a5565",
-  surface: "#faf9f7",
+  tx:  "#0f172a",
+  tx2: "#1e293b",
+  tx3: "#475569",
+  tx4: "#94a3b8",
+  lnF: "rgba(15,23,42,0.04)",
+  ln:  "rgba(15,23,42,0.08)",
+  ink: "#0f172a",
+  slate:  "#1a56db",
+  sage:   "#059669",
+  copper: "#f59e0b",
+  clay:   "#dc2626",
+  wine:   "#7c3aed",
+  surface:"#f8fafc",
 };
 
 // ═══════ TOTAL COMP MODULE ═══════
@@ -78,6 +78,19 @@ export default function TotalComp({ selC, togC, selFam, setSelFam, selSub, setSe
       )}
 
       {subView === "comp" && (<>
+      {/* ── PLAIN-LANGUAGE INTRO ───────────────────────── */}
+      <div style={{ padding: "14px 18px", borderRadius: 10, background: "rgba(84,99,120,0.05)", border: "1px solid rgba(84,99,120,0.12)", marginBottom: 20 }}>
+        <div style={{ fontSize: 13, fontWeight: 600, color: D.slate, fontFamily: "'DM Mono','Noto Sans TC',monospace", marginBottom: 4 }}>
+          {t("How to use this view", "如何使用這個畫面")}
+        </div>
+        <div style={{ fontSize: 13, color: D.tx2, lineHeight: 1.7 }}>
+          {t(
+            "Select a job role and countries to see the full cost breakdown: base + bonus + token + social security. The numbers show what the company actually pays — not just what the employee receives.",
+            "選擇職位和國家，即可看到底薪・獎金・代幣・社保的完整成本結構。這裡顯示的是公司的實際支出——不只是員工拿到的部分。"
+          )}
+        </div>
+      </div>
+
       <div style={{ marginBottom: 20 }}>
         <div style={{ fontSize: 28, fontWeight: 500, color: D.tx, fontFamily: "'DM Mono','Noto Sans TC',monospace" }}>
           {t("Compensation Structure Breakdown", "薪酬結構拆解")}
@@ -210,20 +223,29 @@ export default function TotalComp({ selC, togC, selFam, setSelFam, selSub, setSe
                       })}
                     </tr>
                   ))}
-                  <tr style={{ borderTop: "3px solid " + D.ln, background: D.slate + "06" }}>
-                    <td style={{ position: "sticky", left: 0, zIndex: 2, padding: "12px 16px", background: D.slate + "0a", borderRight: "1px solid " + D.lnF }}>
-                      <span style={{ fontSize: 14, fontWeight: 700, color: D.tx }}>{t("TOTAL EMPLOYER COST", "雇主總成本")}</span>
+                  <tr style={{ borderTop: "3px solid " + D.slate + "40", background: "rgba(84,99,120,0.07)" }}>
+                    <td style={{ position: "sticky", left: 0, zIndex: 2, padding: "14px 16px", background: "rgba(84,99,120,0.1)", borderRight: "1px solid " + D.lnF }}>
+                      <span style={{ fontSize: 15, fontWeight: 800, color: D.slate, letterSpacing: 0.5, fontFamily: "'DM Mono','Noto Sans TC',monospace" }}>{t("TOTAL EMPLOYER COST", "雇主總成本")}</span>
+                      <div style={{ fontSize: 11, color: D.tx3, marginTop: 2 }}>{t("Base + Bonus + Token + ER Social + Allow", "底薪＋獎金＋代幣＋社保＋津貼")}</div>
                     </td>
                     {data.map(d => (
-                      <td key={d.c.id} style={{ padding: "12px 12px", textAlign: "center", borderLeft: "1px solid " + D.lnF }}>
-                        <div style={{ fontSize: 22, fontWeight: 700, fontFamily: "'DM Mono',monospace", color: D.ink }}>{fmt(d.total, usdt)}</div>
+                      <td key={d.c.id} style={{ padding: "14px 12px", textAlign: "center", borderLeft: "1px solid rgba(84,99,120,0.15)", background: "rgba(84,99,120,0.04)" }}>
+                        <div style={{ fontSize: 24, fontWeight: 800, fontFamily: "'DM Mono',monospace", color: D.slate }}>{fmt(d.total, usdt)}</div>
                         <div style={{ fontSize: 12, color: D.copper, fontWeight: 500 }}>{d.tc.multi || "—"}× {t("of base", "底薪")}</div>
                       </td>
                     ))}
                   </tr>
                   <tr style={{ borderTop: "1px solid " + D.lnF }}>
                     <td style={{ position: "sticky", left: 0, zIndex: 2, padding: "10px 16px", background: D.surface, borderRight: "1px solid " + D.lnF }}>
-                      <span style={{ fontSize: 12, color: D.tx3 }}>{t("ER Statutory Detail", "雇主法定提撥")}</span>
+                      <span
+                        style={{ fontSize: 12, color: D.tx3, borderBottom: "1px dashed " + D.tx4, cursor: "help" }}
+                        title={t(
+                          "ER Cost = employer's statutory contribution to pension, health insurance, and other social programs. This is on top of the salary the employee receives. Examples: Japan ~14.5%, Philippines ~10%, UAE 0% for expats.",
+                          "雇主成本＝雇主依法提撥至勞退、健保及其他社保計畫的金額，不包含在員工薪資內。例：日本約 14.5%、菲律賓約 10%、阿聯酋外籍員工 0%。"
+                        )}
+                      >
+                        {t("ER Statutory Detail", "雇主法定提撥")} ⓘ
+                      </span>
                     </td>
                     {data.map(d => (
                       <td key={d.c.id} style={{ padding: "10px 12px", textAlign: "center", borderLeft: "1px solid " + D.lnF }}>
@@ -308,6 +330,46 @@ export default function TotalComp({ selC, togC, selFam, setSelFam, selSub, setSe
                       </div>
                     ))}
                   </div>
+
+                  {/* ── DECISION INSIGHT ─────────────────────── */}
+                  {(() => {
+                    const cheapestName  = t(cheapest.c.n,  cheapest.c.zh);
+                    const costliestName = t(costliest.c.n, costliest.c.zh);
+                    const savingPct     = costliest.total > 0
+                      ? Math.round((1 - cheapest.total / costliest.total) * 100)
+                      : 0;
+                    const highestTokenD    = byToken[0];
+                    const highestTokenName = t(highestTokenD.c.n, highestTokenD.c.zh);
+                    const highestERD    = byER[0];
+                    const highestERName = t(highestERD.c.n, highestERD.c.zh);
+                    return (
+                      <div style={{ marginTop: 16, padding: "14px 16px", borderRadius: 10, background: "rgba(5,150,105,0.06)", border: "1px solid rgba(5,150,105,0.2)" }}>
+                        <div style={{ fontSize: 13, fontWeight: 700, color: D.sage, marginBottom: 8, fontFamily: "'DM Mono','Noto Sans TC',monospace" }}>
+                          💡 {t("Decision Insight", "決策建議")}
+                        </div>
+                        <ul style={{ margin: 0, paddingLeft: 18, fontSize: 13, color: D.tx2, lineHeight: 1.85 }}>
+                          <li>
+                            {t(
+                              `Employer cost gap: ${spread}×. ${cheapestName} is ${savingPct}% cheaper than ${costliestName} for the same role — a meaningful difference for headcount budget planning.`,
+                              `雇主成本差距達 ${spread}×。相同職位在${cheapestName}比${costliestName}便宜 ${savingPct}%——對人力預算規劃影響顯著。`
+                            )}
+                          </li>
+                          <li>
+                            {t(
+                              `${highestTokenName} has the highest token allocation (${highestTokenD.tc.token || 0}%) — retention structure relies heavily on equity/token upside rather than cash. Different from a cash-heavy market.`,
+                              `${highestTokenName}的代幣比例最高（${highestTokenD.tc.token || 0}%）——留才結構高度依賴代幣增值而非現金，與現金薪酬主導市場截然不同。`
+                            )}
+                          </li>
+                          <li>
+                            {t(
+                              `${highestERName} carries the highest statutory employer burden (${highestERD.tc.er || 0}% ER social cost). Factor this in when comparing offer costs across locations.`,
+                              `${highestERName}的法定雇主社保成本最重（${highestERD.tc.er || 0}%）。跨地點比較 offer 成本時，此項目不可忽略。`
+                            )}
+                          </li>
+                        </ul>
+                      </div>
+                    );
+                  })()}
                 </div>
               </Card>
             );

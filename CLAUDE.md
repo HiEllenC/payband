@@ -77,6 +77,30 @@ Ellen Chuang — Head of C&B at Andes Group (multi-entity crypto/fintech holding
 - ✅ `git add` 和 `git commit`（本機操作，不花錢）
 - ✅ `npx netlify dev`（本機預覽，不花錢）
 
+## 專業 Agent 團隊（Payband 專用）
+
+在這個專案裡，除了通用 agents，優先使用以下專業角色：
+
+| Agent | 何時用 |
+|-------|--------|
+| `salary-matrix-auditor` | 更新 FB/CM/SM 數據、懷疑薪資數字不對、新增職能時 |
+| `labor-law-auditor` | 更新法規內容、新增/修改節假日 DB、懷疑法規數值有誤時 |
+| `crypto-comp-reviewer` | 開發 VestingSim、TotalComp、Relocation、GrossToNet 時 |
+| `hr-ux-reviewer` | 設計新模組 UI、重大改版前、確認 HR 用戶流程是否順暢時 |
+| `data-validator` | 快速掃描所有數據層問題（通用版） |
+| `i18n-checker` | 確認中英文雙語完整性 |
+
+### 標準審查流程（重大改動前）
+```
+用 subagents 平行審查：
+- salary-matrix-auditor 驗證薪資數據
+- labor-law-auditor 驗證法規和節假日
+- i18n-checker 確認雙語完整
+- code-reviewer 審查程式碼品質
+- hr-ux-reviewer 確認 HR 用戶體驗
+不要修改，給我審查報告。
+```
+
 ## 協作守則
 - 誠實回報問題，不要為了客氣而隱藏風險
 - 不確定的事情直接說「不確定」，不要猜測

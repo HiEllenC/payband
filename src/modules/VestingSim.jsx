@@ -3,30 +3,38 @@ import Card from "../components/Card.jsx";
 import { COUNTRIES } from "../data/countries.js";
 
 const D = {
-  tx: "#1c1c1f", tx2: "#4a4a52", tx3: "#7d7d88", tx4: "#a8a8b4",
-  lnF: "rgba(0,0,0,0.03)", ln: "rgba(0,0,0,0.06)",
-  ink: "#2d3142", slate: "#546378", sage: "#5f7a61", copper: "#96714a",
-  clay: "#a06b52", wine: "#8a5565", surface: "#faf9f7",
+  tx:  "#0f172a",
+  tx2: "#1e293b",
+  tx3: "#475569",
+  tx4: "#94a3b8",
+  lnF: "rgba(15,23,42,0.04)",
+  ln:  "rgba(15,23,42,0.08)",
+  ink: "#0f172a",
+  slate:  "#1a56db",
+  sage:   "#059669",
+  copper: "#f59e0b",
+  clay:   "#dc2626",
+  wine:   "#7c3aed",
+  surface:"#f8fafc",
 };
 
-// Country tax treatment for token/equity vesting
+// Country tax treatment — income rate at vest + capital gains rate on post-vest appreciation
 const TOKEN_TAX = {
-  us: { rate: 0.37, zh: "RSU 歸屬時按普通收入課稅（聯邦最高 37%＋州稅約 5.5%）。歸屬後增值按資本利得（0/15/20%）。", en: "RSU taxed as ordinary income at vest (federal up to 37% + ~5.5% state). Post-vest appreciation taxed as capital gains." },
-  gb: { rate: 0.28, zh: "EMI 期權：CGT 10–20%。非核准期權：行使時 PAYE 扣薪稅（最高 45%）。年度 CGT 免稅額 £3,000。", en: "EMI options: CGT 10–20%. Unapproved options: PAYE at exercise (up to 45%). Annual CGT allowance £3,000." },
-  ch: { rate: 0.31, zh: "歸屬時按市值課稅，員工社保 AHV/IV 約 6.3%。各州稅率不同，有效稅率約 28–35%。", en: "Taxed at fair market value on vest. Employee social security AHV/IV ~6.3%. Cantons vary, effective ~28–35%." },
-  mt: { rate: 0.35, zh: "股權：歸屬時所得稅（最高 35%）＋社保。加密代幣：無明確規範，通常按薪資收入處理。", en: "Equity: income tax up to 35% + social security at vest. Crypto tokens: no specific framework, likely treated as income." },
-  ae: { rate: 0.00, zh: "無個人所得稅，無資本利得稅。外籍員工無強制社保。代幣歸屬最有利的司法管轄區。", en: "No personal income tax. No CGT. No mandatory social security for expats. Most favorable jurisdiction for token vesting." },
-  sg: { rate: 0.22, zh: "ESOP 在行使時課稅（薪資所得）。無資本利得稅。外籍員工 CPF 不適用。最高稅率 24%。", en: "ESOP taxed at exercise as employment income. No CGT. CPF not applicable for foreigners. Max rate 24%." },
-  hk: { rate: 0.15, zh: "股票期權在行使時課稅（薪俸稅，上限 15%）。無資本利得稅。外籍員工 MPF 貢獻 5%（上限）。", en: "Share options taxed at exercise under Salaries Tax (capped at 15%). No CGT. MPF contribution 5% for employees (capped)." },
-  jp: { rate: 0.45, zh: "股票期權：行使時按薪資所得課稅。加密貨幣：雜項收入，有效稅率 15–55%。CGT 20.315%。", en: "Stock options: employment income at exercise. Crypto: miscellaneous income, effective 15–55%. CGT 20.315%." },
-  kr: { rate: 0.40, zh: "RSU：歸屬時按薪資所得課稅。CGT：大股東 22–25%。加密貨幣收益：超過門檻 20%（2025 起正式課稅）。", en: "RSU: income at vest. CGT: 22–25% for large shareholders. Crypto gains: 20% above threshold (formally taxed from 2025)." },
-  tw: { rate: 0.30, zh: "員工認股：行使差額為薪資所得（5–40%）。合格新創期權有優惠稅率。無獨立 CGT，計入綜所稅。", en: "Employee stock: spread at exercise is employment income (5–40%). Qualifying startup options have preferential rates. No separate CGT." },
-  ph: { rate: 0.35, zh: "RSU/期權：歸屬/行使時按普通收入課稅（最高 35%）。股份 CGT 15%。無正式加密貨幣稅務框架。", en: "RSU/options: ordinary income at vesting/exercise (up to 35%). Shares CGT 15%. No formal crypto tax framework." },
-  my: { rate: 0.30, zh: "ESOS：行使價值超過參考價部分為薪資所得。無資本利得稅。加密貨幣：無正式指引，可能按收入課稅。", en: "ESOS: excess of exercise value over reference price is employment income. No CGT. Crypto: no formal guidance, likely income." },
+  us: { income: 0.37, cgt: 0.20, zh: "RSU 歸屬時按普通收入課稅（最高 37%＋州稅）。歸屬後增值按長期 CGT 20%。", en: "RSU taxed as ordinary income at vest (up to 37% + state). Post-vest appreciation: long-term CGT 20%." },
+  gb: { income: 0.45, cgt: 0.20, zh: "非核准期權：行使時 PAYE 最高 45%。歸屬後增值：CGT 20%（扣除 £3K 免稅額後）。", en: "Unapproved options: PAYE up to 45% at vest. Post-vest: CGT 20% (above £3K allowance)." },
+  ch: { income: 0.35, cgt: 0.00, zh: "歸屬時按市值課稅（有效稅率 28–35%）。瑞士無資本利得稅（私人資產）。", en: "Taxed at FMV on vest (effective 28–35%). Switzerland has no CGT on private asset gains." },
+  mt: { income: 0.35, cgt: 0.15, zh: "歸屬時所得稅最高 35%。代幣出售：CGT 15%（加密資產依最新指引課稅）。", en: "Income tax up to 35% at vest. Token sale: CGT 15% per latest crypto guidance." },
+  ae: { income: 0.00, cgt: 0.00, zh: "無個人所得稅，無資本利得稅。阿聯酋是代幣歸屬最有利的司法管轄區。", en: "Zero income tax. Zero CGT. UAE is the most favorable jurisdiction for token vesting." },
+  sg: { income: 0.24, cgt: 0.00, zh: "ESOP 在行使時課稅（最高 24%，薪資所得）。無資本利得稅。", en: "ESOP taxed at exercise as employment income (max 24%). No CGT in Singapore." },
+  hk: { income: 0.15, cgt: 0.00, zh: "股票期權歸屬時薪俸稅，上限 15%。無資本利得稅。HK 是 APAC 最低稅負地。", en: "Share options taxed under Salaries Tax (capped 15%). No CGT. Lowest APAC tax burden." },
+  jp: { income: 0.55, cgt: 0.2031, zh: "RSU/期權歸屬時：薪資所得最高 55%（含地方稅）。賣出增值：CGT 20.315%。", en: "RSU/option at vest: employment income up to 55% (incl. local). Post-vest appreciation: CGT 20.315%." },
+  kr: { income: 0.49, cgt: 0.22, zh: "RSU 歸屬時：薪資所得最高 49.5%（含地方稅）。大股東賣出：CGT 22–25%。", en: "RSU at vest: income up to 49.5% (incl. local surcharge). Large shareholder sale: CGT 22–25%." },
+  tw: { income: 0.40, cgt: 0.00, zh: "員工認股行使差額：薪資所得 5–40%。無獨立 CGT，計入綜合所得稅。賣出通常免稅。", en: "Stock exercise spread: employment income 5–40%. No separate CGT; post-vest sale generally exempt." },
+  ph: { income: 0.35, cgt: 0.15, zh: "歸屬/行使時：普通收入最高 35%。股份出售 CGT 15%。無正式加密稅務框架。", en: "At vest/exercise: ordinary income up to 35%. Share sale: CGT 15%. No formal crypto tax framework." },
+  my: { income: 0.30, cgt: 0.00, zh: "ESOS 行使差額：薪資所得。無資本利得稅（持有資產）。加密貨幣尚無正式指引。", en: "ESOS exercise spread: employment income. No CGT on capital assets. Crypto: no formal guidance." },
 };
 
 function calcVesting(grant, cliffYrs, totalYrs, freq) {
-  // All amounts in USD. Returns array of { period, yr, vested, cumulative, label, isCliff }
   const periodsPerYear = freq === "monthly" ? 12 : freq === "quarterly" ? 4 : 1;
   const totalPeriods = totalYrs * periodsPerYear;
   const cliffPeriod = cliffYrs * periodsPerYear;
@@ -39,7 +47,7 @@ function calcVesting(grant, cliffYrs, totalYrs, freq) {
     if (cliffPeriod > 0 && p < cliffPeriod) {
       vested = 0;
     } else if (cliffPeriod > 0 && p === cliffPeriod) {
-      vested = perPeriod * cliffPeriod; // all accumulated at cliff
+      vested = perPeriod * cliffPeriod;
     } else {
       vested = perPeriod;
     }
@@ -54,6 +62,18 @@ function calcVesting(grant, cliffYrs, totalYrs, freq) {
     result.push({ period: p, yr, vested, cumulative, label, isCliff: cliffPeriod > 0 && p === cliffPeriod });
   }
   return result;
+}
+
+// Dual-layer tax calc: income at vest + CGT on appreciation
+function calcDualTax(vestValue, priceMult, tax) {
+  const incomeTax = vestValue * tax.income;
+  const afterIncome = vestValue - incomeTax;
+  // CGT applies to appreciation above vest price
+  const appreciation = vestValue * (priceMult - 1);
+  const cgtTax = appreciation > 0 ? appreciation * tax.cgt : 0;
+  const totalTax = incomeTax + cgtTax;
+  const netProceeds = vestValue * priceMult - totalTax;
+  return { incomeTax, afterIncome, appreciation, cgtTax, totalTax, netProceeds };
 }
 
 const Btn = ({ active, onClick, children }) => (
@@ -75,6 +95,8 @@ export default function VestingSim({ usdt, lang, t }) {
   const [freq, setFreq]         = useState("quarterly");
   const [totalYrs, setTotalYrs] = useState(4);
   const [priceChg, setPriceChg] = useState(0);
+  const [selCountry, setSelCountry] = useState("sg");
+  const [saleChg, setSaleChg]   = useState(50); // % appreciation when sold vs vest price
 
   const vestData = useMemo(() =>
     calcVesting(grant, cliffYrs, totalYrs, freq),
@@ -90,6 +112,32 @@ export default function VestingSim({ usdt, lang, t }) {
 
   const maxVested = Math.max(...vestData.map(d => d.vested), 1);
 
+  // Aggregate by year for CashflowChart
+  const yearlyData = useMemo(() => {
+    const byYr = {};
+    vestData.forEach(d => {
+      if (!byYr[d.yr]) byYr[d.yr] = 0;
+      byYr[d.yr] += d.vested;
+    });
+    return Object.entries(byYr).map(([yr, vested]) => ({ yr: Number(yr), vested }));
+  }, [vestData]);
+
+  const tax = TOKEN_TAX[selCountry];
+  const saleMult = 1 + saleChg / 100;
+  const totalVested = vestData[vestData.length - 1]?.cumulative || grant;
+
+  // CashflowChart: year-by-year after-tax cashflow
+  const cashflowRows = useMemo(() => {
+    let cum = 0;
+    return yearlyData.map(({ yr, vested }) => {
+      const { incomeTax, cgtTax, netProceeds } = calcDualTax(vested, saleMult, tax);
+      cum += netProceeds;
+      return { yr, vested, incomeTax, cgtTax, net: vested * saleMult - incomeTax - cgtTax, cumNet: cum };
+    });
+  }, [yearlyData, tax, saleMult]);
+
+  const maxNetProceeds = Math.max(...cashflowRows.map(r => r.vested * saleMult), 1);
+
   return (
     <div>
       <div style={{ marginBottom: 20 }}>
@@ -97,7 +145,7 @@ export default function VestingSim({ usdt, lang, t }) {
           {t("Token / Equity Vesting Simulator", "代幣 / 股權歸屬模擬器")}
         </div>
         <p style={{ fontSize: 14, color: D.tx3, marginTop: 4 }}>
-          {t("Set grant amount, cliff, and vesting schedule — see year-by-year payout under 3 price scenarios, plus each country's tax treatment", "設定授予金額、懸崖期與歸屬頻率，查看3種價格情境下的逐年到手金額，以及各國稅務處理方式")}
+          {t("Vesting schedule + dual-layer tax (income at vest + CGT on appreciation) + country cashflow comparison", "歸屬時程 + 雙層稅務（歸屬時所得稅 + 出售增值 CGT）+ 各國到手現金流比較")}
         </p>
       </div>
 
@@ -106,8 +154,8 @@ export default function VestingSim({ usdt, lang, t }) {
         {[
           { icon: "⛰️", title: t("Cliff","懸崖期（Cliff）"),       desc: t("Employee receives NOTHING until cliff date. 1yr cliff = zero payout if they leave before 12 months.","懸崖期內離職＝0。1年懸崖=滿12個月前離職一毛不拿，到達後才一次補發。") },
           { icon: "📅", title: t("Vesting Frequency","歸屬頻率"),   desc: t("After cliff: how often tokens unlock. Quarterly = every 3 months. Monthly = smoother cashflow.","懸崖後每隔多久釋放一批：每月最平滑，每季最常見（加密交易所標準結構）。") },
-          { icon: "💸", title: t("Price Scenarios","價格情境"),      desc: t("Token grant is denominated in units × price. -50% scenario = tokens worth half. Plan for volatility.","代幣授予以數量×價格計算。-50%情境測試最壞情況，+50%展示留才吸引力。") },
-          { icon: "🌍", title: t("Tax Impact","各國稅務影響"),       desc: t("UAE: 0% tax = full value. Japan: up to 55% = highest burden. Jurisdiction matters as much as grant size.","阿聯酋0%稅，全拿；日本最高55%，差距極大。選對國家就是最好的薪酬設計。") },
+          { icon: "🧾", title: t("Income Tax at Vest","歸屬時所得稅"), desc: t("When tokens vest, most countries treat this as employment income — taxed immediately at marginal rate.","代幣歸屬時，多數國家視為薪資收入立即課稅，按邊際稅率計算。") },
+          { icon: "📈", title: t("Capital Gains Tax","資本利得稅"), desc: t("If you HOLD tokens after vest and price rises, the appreciation is taxed separately as CGT (many APAC countries: 0%).","歸屬後繼續持有、價格上漲的部分，以 CGT 計算。AE/SG/HK/TW/MY 均為 0% CGT。") },
         ].map(({ icon, title, desc }) => (
           <div key={title} style={{ padding: "10px 14px", borderRadius: 8, background: "rgba(0,0,0,0.02)", border: "1px solid rgba(0,0,0,0.05)" }}>
             <div style={{ fontSize: 16, marginBottom: 4 }}>{icon}</div>
@@ -175,7 +223,7 @@ export default function VestingSim({ usdt, lang, t }) {
             {/* Custom price slider */}
             <div style={{ flex: 1, minWidth: 200 }}>
               <div style={{ fontSize: 12, color: D.tx3, marginBottom: 6 }}>
-                {t("Custom Price Change", "自訂價格變動")}：
+                {t("Custom Price Change at Vest", "歸屬時自訂價格變動")}：
                 <span style={{ color: priceChg >= 0 ? D.sage : D.clay, fontWeight: 600, fontFamily: "'DM Mono',monospace" }}>
                   {priceChg >= 0 ? "+" : ""}{priceChg}%
                 </span>
@@ -327,18 +375,217 @@ export default function VestingSim({ usdt, lang, t }) {
         </div>
       </Card>
 
+      {/* ══════════════════════════════════════════════════════════
+          DUAL-LAYER TAX + CASHFLOW CHART
+          ══════════════════════════════════════════════════════════ */}
+      <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 10, marginTop: 8 }}>
+        <div style={{ height: 1, flex: 1, background: D.ln }} />
+        <span style={{ fontSize: 11, fontWeight: 600, letterSpacing: 2, color: D.tx3, fontFamily: "'DM Mono',monospace", textTransform: "uppercase" }}>
+          {t("DUAL-LAYER TAX ANALYSIS", "雙層稅務分析")}
+        </span>
+        <div style={{ height: 1, flex: 1, background: D.ln }} />
+      </div>
+
+      {/* Country selector + sale price */}
+      <Card glow style={{ marginBottom: 14 }}>
+        <div style={{ padding: "18px 20px" }}>
+          <div style={{ display: "flex", flexWrap: "wrap", gap: 24, alignItems: "flex-start" }}>
+            <div>
+              <div style={{ fontSize: 12, color: D.tx3, marginBottom: 8 }}>
+                {t("Select Country for Tax Calculation", "選擇計算稅務的國家")}
+              </div>
+              <div style={{ display: "flex", flexWrap: "wrap", gap: 6 }}>
+                {Object.entries(TOKEN_TAX).map(([id, info]) => {
+                  const c = COUNTRIES.find(c => c.id === id);
+                  return (
+                    <button key={id} onClick={() => setSelCountry(id)} style={{
+                      padding: "5px 10px", borderRadius: 6,
+                      border: `1.5px solid ${selCountry === id ? D.slate : D.ln}`,
+                      background: selCountry === id ? D.slate + "12" : "transparent",
+                      cursor: "pointer", fontSize: 13,
+                      fontFamily: "'DM Mono','Noto Sans TC',monospace",
+                      color: selCountry === id ? D.slate : D.tx3,
+                      transition: "all 0.15s",
+                    }}>
+                      {c?.flag} {t(c?.n, c?.zh)}
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+            <div style={{ flex: 1, minWidth: 200 }}>
+              <div style={{ fontSize: 12, color: D.tx3, marginBottom: 6 }}>
+                {t("Token Price Appreciation When Sold", "出售時價格漲幅（相對歸屬時）")}：
+                <span style={{ color: saleChg >= 0 ? D.sage : D.clay, fontWeight: 600, fontFamily: "'DM Mono',monospace" }}>
+                  {saleChg >= 0 ? "+" : ""}{saleChg}%
+                </span>
+              </div>
+              <input
+                type="range" min={-80} max={300} value={saleChg}
+                onChange={e => setSaleChg(Number(e.target.value))}
+                style={{ width: "100%", accentColor: D.sage }}
+              />
+              <div style={{ display: "flex", justifyContent: "space-between", fontSize: 10, color: D.tx4, fontFamily: "'DM Mono',monospace" }}>
+                <span>-80%</span><span>0%</span><span>+300%</span>
+              </div>
+              <div style={{ marginTop: 6, fontSize: 11, color: D.tx4, lineHeight: 1.5 }}>
+                {t("Sell immediately at vest: 0%. Hold and price rises: positive. Price drops: negative.",
+                   "歸屬時立即賣出：0%。持有後漲價：正值。跌價：負值。")}
+              </div>
+            </div>
+          </div>
+
+          {/* Summary cards for selected country */}
+          {(() => {
+            const { incomeTax, cgtTax, netProceeds } = calcDualTax(totalVested, saleMult, tax);
+            const grossSale = totalVested * saleMult;
+            const selectedC = COUNTRIES.find(c => c.id === selCountry);
+            return (
+              <div style={{ marginTop: 20 }}>
+                <div style={{ fontSize: 12, color: D.tx4, marginBottom: 10, fontFamily: "'DM Mono','Noto Sans TC',monospace" }}>
+                  {selectedC?.flag} {t(selectedC?.n, selectedC?.zh)} — {t("Full Grant After Dual-Layer Tax", "全額授予雙層稅後結果")}
+                </div>
+                <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(150px,1fr))", gap: 10 }}>
+                  {[
+                    { label: t("Gross Vested","毛歸屬額"), val: totalVested, color: D.ink, sub: t("at grant price","按授予時價格") },
+                    { label: t("Income Tax at Vest","歸屬時所得稅"), val: -incomeTax, color: D.copper, sub: `~${Math.round(tax.income * 100)}% ${t("rate","稅率")}` },
+                    ...(saleChg !== 0 ? [{ label: saleChg > 0 ? t("Capital Gains Tax","資本利得稅") : t("Capital Loss","資本損失"), val: -cgtTax, color: D.clay, sub: `~${Math.round(tax.cgt * 100)}% CGT` }] : []),
+                    { label: t("Net Proceeds","稅後到手"), val: netProceeds, color: D.sage, sub: `${Math.round(netProceeds / grossSale * 100)}% ${t("of sale value","占出售金額")}` },
+                  ].map(({ label, val, color, sub }) => (
+                    <div key={label} style={{ padding: "12px 14px", borderRadius: 8, background: color + "08", border: `1px solid ${color}18` }}>
+                      <div style={{ fontSize: 11, color: D.tx4, marginBottom: 4 }}>{label}</div>
+                      <div style={{ fontSize: 20, fontWeight: 700, fontFamily: "'DM Mono',monospace", color }}>
+                        {val >= 0 ? "" : "-"}${(Math.abs(val) / 1000).toFixed(0)}K
+                      </div>
+                      <div style={{ fontSize: 11, color: D.tx4, marginTop: 2 }}>{sub}</div>
+                    </div>
+                  ))}
+                </div>
+                <div style={{ marginTop: 10, padding: "8px 12px", background: D.slate + "06", borderRadius: 6, fontSize: 11, color: D.tx3, lineHeight: 1.6 }}>
+                  {lang === "zh" ? tax.zh : tax.en}
+                </div>
+              </div>
+            );
+          })()}
+        </div>
+      </Card>
+
+      {/* ── CASHFLOW CHART ─────────────────────────── */}
+      <Card glow style={{ marginBottom: 14 }}>
+        <div style={{ padding: "18px 20px" }}>
+          <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 14 }}>
+            <span style={{ fontSize: 11, fontWeight: 500, letterSpacing: 2.5, color: D.tx3, fontFamily: "'DM Mono',monospace", textTransform: "uppercase" }}>
+              {t("AFTER-TAX CASHFLOW BY YEAR", "逐年稅後現金流")}
+            </span>
+            <div style={{ display: "flex", gap: 12 }}>
+              {[
+                { color: D.sage,   label: t("Net After All Tax","全稅後淨額") },
+                { color: D.copper, label: t("Income Tax","所得稅") },
+                { color: D.clay,   label: "CGT" },
+              ].map(item => (
+                <div key={item.label} style={{ display: "flex", alignItems: "center", gap: 4 }}>
+                  <div style={{ width: 10, height: 10, borderRadius: 2, background: item.color, opacity: 0.6 }} />
+                  <span style={{ fontSize: 11, color: D.tx3 }}>{item.label}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {cashflowRows.map((row) => {
+            const grossVal = row.vested * saleMult;
+            const pct = grossVal / maxNetProceeds;
+            const netPct = row.net / grossVal;
+            const itPct = row.incomeTax / grossVal;
+            const cgtPct = row.cgtTax / grossVal;
+            return (
+              <div key={row.yr} style={{ marginBottom: 14 }}>
+                <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 4 }}>
+                  <span style={{ fontSize: 12, fontWeight: 600, color: D.tx, fontFamily: "'DM Mono',monospace" }}>
+                    {t("Year","年")} {row.yr}
+                  </span>
+                  <span style={{ fontSize: 11, color: D.tx4, fontFamily: "'DM Mono',monospace" }}>
+                    {t("Gross","毛額")} ${(row.vested / 1000).toFixed(0)}K
+                    {saleChg !== 0 && ` → ${t("at sale","出售")} $${(grossVal / 1000).toFixed(0)}K`}
+                    {" "} · {t("Net","淨")} <span style={{ color: D.sage, fontWeight: 600 }}>${(row.net / 1000).toFixed(0)}K</span>
+                  </span>
+                </div>
+                {/* Stacked bar: net + income tax + CGT */}
+                <div style={{ display: "flex", height: 28, borderRadius: 5, overflow: "hidden", width: `${Math.max(pct * 100, 4)}%`, transition: "width 0.5s cubic-bezier(.22,1,.36,1)", background: D.lnF }}>
+                  <div style={{ width: `${netPct * 100}%`, background: D.sage, opacity: 0.55, display: "flex", alignItems: "center", paddingLeft: 6, minWidth: 4 }}>
+                    {netPct > 0.2 && <span style={{ fontSize: 11, fontWeight: 600, color: "#fff", fontFamily: "'DM Mono',monospace", whiteSpace: "nowrap" }}>${(row.net / 1000).toFixed(0)}K</span>}
+                  </div>
+                  <div style={{ width: `${itPct * 100}%`, background: D.copper, opacity: 0.5, minWidth: itPct > 0 ? 2 : 0 }} />
+                  <div style={{ width: `${cgtPct * 100}%`, background: D.clay, opacity: 0.5, minWidth: cgtPct > 0 ? 2 : 0 }} />
+                </div>
+                <div style={{ display: "flex", gap: 12, marginTop: 3 }}>
+                  {[
+                    { label: t("Net","淨"), val: row.net, color: D.sage },
+                    { label: t("Inc Tax","所得稅"), val: row.incomeTax, color: D.copper },
+                    ...(row.cgtTax > 0 ? [{ label: "CGT", val: row.cgtTax, color: D.clay }] : []),
+                    { label: t("Cumulative","累計淨額"), val: row.cumNet, color: D.slate },
+                  ].map(item => (
+                    <div key={item.label} style={{ fontSize: 10, color: item.color, fontFamily: "'DM Mono',monospace" }}>
+                      {item.label} <strong>${(item.val / 1000).toFixed(0)}K</strong>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            );
+          })}
+
+          {/* Total summary */}
+          {(() => {
+            const last = cashflowRows[cashflowRows.length - 1];
+            if (!last) return null;
+            const totalIt = cashflowRows.reduce((s, r) => s + r.incomeTax, 0);
+            const totalCgt = cashflowRows.reduce((s, r) => s + r.cgtTax, 0);
+            const totalNet = last.cumNet;
+            const grossSaleTotal = totalVested * saleMult;
+            return (
+              <div style={{ marginTop: 16, paddingTop: 14, borderTop: `2px solid ${D.ln}`, display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(130px,1fr))", gap: 10 }}>
+                <div style={{ textAlign: "center" }}>
+                  <div style={{ fontSize: 11, color: D.tx4, marginBottom: 2 }}>{t("Total Gross (at sale)","全部出售毛額")}</div>
+                  <div style={{ fontSize: 20, fontWeight: 700, fontFamily: "'DM Mono',monospace", color: D.ink }}>${(grossSaleTotal / 1000).toFixed(0)}K</div>
+                </div>
+                <div style={{ textAlign: "center" }}>
+                  <div style={{ fontSize: 11, color: D.tx4, marginBottom: 2 }}>{t("Total Income Tax","所得稅合計")}</div>
+                  <div style={{ fontSize: 20, fontWeight: 700, fontFamily: "'DM Mono',monospace", color: D.copper }}>-${(totalIt / 1000).toFixed(0)}K</div>
+                </div>
+                {totalCgt > 0 && (
+                  <div style={{ textAlign: "center" }}>
+                    <div style={{ fontSize: 11, color: D.tx4, marginBottom: 2 }}>CGT</div>
+                    <div style={{ fontSize: 20, fontWeight: 700, fontFamily: "'DM Mono',monospace", color: D.clay }}>-${(totalCgt / 1000).toFixed(0)}K</div>
+                  </div>
+                )}
+                <div style={{ textAlign: "center" }}>
+                  <div style={{ fontSize: 11, color: D.tx4, marginBottom: 2 }}>{t("Total Net Proceeds","稅後合計到手")}</div>
+                  <div style={{ fontSize: 24, fontWeight: 700, fontFamily: "'DM Mono',monospace", color: D.sage }}>${(totalNet / 1000).toFixed(0)}K</div>
+                  <div style={{ fontSize: 11, color: D.tx4 }}>{Math.round(totalNet / grossSaleTotal * 100)}% {t("retained","實際保留")}</div>
+                </div>
+              </div>
+            );
+          })()}
+        </div>
+      </Card>
+
       {/* ── COUNTRY TAX TREATMENT ─────────────────── */}
       <Card glow>
         <div style={{ padding: "18px 20px" }}>
           <span style={{ fontSize: 11, fontWeight: 500, letterSpacing: 2.5, color: D.tx3, fontFamily: "'DM Mono',monospace", textTransform: "uppercase" }}>
-            {t("COUNTRY TAX TREATMENT", "各國稅務處理")}
+            {t("ALL COUNTRIES — DUAL-LAYER TAX SUMMARY", "各國雙層稅務一覽")}
           </span>
           <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill,minmax(270px,1fr))", gap: 10, marginTop: 14 }}>
             {Object.entries(TOKEN_TAX).map(([id, info]) => {
               const c = COUNTRIES.find(c => c.id === id);
-              const afterTax = grant * (1 - info.rate);
+              const { netProceeds } = calcDualTax(grant, saleMult, info);
+              const grossSale = grant * saleMult;
               return (
-                <div key={id} style={{ padding: "12px 14px", borderRadius: 8, background: D.lnF, border: `1px solid ${D.ln}` }}>
+                <div key={id} onClick={() => setSelCountry(id)} style={{
+                  padding: "12px 14px", borderRadius: 8, cursor: "pointer",
+                  background: selCountry === id ? D.slate + "0a" : D.lnF,
+                  border: `1px solid ${selCountry === id ? D.slate + "30" : D.ln}`,
+                  transition: "all 0.15s",
+                }}>
                   <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 6 }}>
                     <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
                       <span style={{ fontSize: 16 }}>{c?.flag}</span>
@@ -347,11 +594,18 @@ export default function VestingSim({ usdt, lang, t }) {
                       </span>
                     </div>
                     <div style={{ textAlign: "right" }}>
-                      <div style={{ fontSize: 13, fontWeight: 600, fontFamily: "'DM Mono',monospace", color: info.rate === 0 ? D.sage : D.clay }}>
-                        {info.rate === 0 ? t("Tax Free","免稅") : `~${Math.round(info.rate * 100)}%`}
-                      </div>
                       <div style={{ fontSize: 11, color: D.tx4, fontFamily: "'DM Mono',monospace" }}>
-                        {t("After-tax","稅後")} ≈${(afterTax / 1000).toFixed(0)}K
+                        <span style={{ color: D.copper }}>{Math.round(info.income * 100)}%</span>
+                        <span style={{ color: D.tx4 }}> income</span>
+                        {" + "}
+                        <span style={{ color: info.cgt > 0 ? D.clay : D.sage }}>{Math.round(info.cgt * 100)}%</span>
+                        <span style={{ color: D.tx4 }}> CGT</span>
+                      </div>
+                      <div style={{ fontSize: 13, fontWeight: 700, fontFamily: "'DM Mono',monospace", color: D.sage }}>
+                        ${(netProceeds / 1000).toFixed(0)}K {t("net","淨")}
+                      </div>
+                      <div style={{ fontSize: 10, color: D.tx4, fontFamily: "'DM Mono',monospace" }}>
+                        {Math.round(netProceeds / grossSale * 100)}% {t("retained","保留")}
                       </div>
                     </div>
                   </div>
@@ -363,7 +617,7 @@ export default function VestingSim({ usdt, lang, t }) {
             })}
           </div>
           <div style={{ marginTop: 12, padding: "8px 12px", background: D.wine + "09", borderRadius: 6, fontSize: 11, color: D.tx3, lineHeight: 1.5 }}>
-            ⚠️ {t("Illustrative only. Token/equity tax treatment varies significantly by jurisdiction, grant type, and individual circumstances. Always consult a qualified tax advisor before making compensation decisions.", "僅供參考。代幣/股權稅務處理因司法管轄區、授予類型和個人情況差異極大。做出薪酬決策前，請務必諮詢合格稅務顧問。")}
+            ⚠️ {t("Illustrative only. Token/equity tax treatment varies by jurisdiction, grant type, holding period, and individual circumstances. Always consult a qualified tax advisor.", "僅供參考。代幣/股權稅務處理因司法管轄區、授予類型、持有期間和個人情況差異極大。請務必諮詢合格稅務顧問。")}
           </div>
         </div>
       </Card>

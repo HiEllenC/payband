@@ -3,16 +3,19 @@ import Card from "../components/Card.jsx";
 import WorldMap from "../components/WorldMap.jsx";
 
 const D = {
-  tx: "#1c1c1f",
-  tx2: "#4a4a52",
-  tx3: "#7d7d88",
-  tx4: "#a8a8b4",
-  ink: "#2d3142",
-  slate: "#546378",
-  sage: "#5f7a61",
-  copper: "#96714a",
-  clay: "#a06b52",
-  wine: "#8a5565",
+  tx:  "#0f172a",
+  tx2: "#1e293b",
+  tx3: "#475569",
+  tx4: "#94a3b8",
+  lnF: "rgba(15,23,42,0.04)",
+  ln:  "rgba(15,23,42,0.08)",
+  ink: "#0f172a",
+  slate:  "#1a56db",
+  sage:   "#059669",
+  copper: "#f59e0b",
+  clay:   "#dc2626",
+  wine:   "#7c3aed",
+  surface:"#f8fafc",
 };
 
 const Tag = ({ children, color = D.tx3 }) => (
@@ -29,23 +32,23 @@ export default function Home({ selC, togC, setTab, ready, t }) {
       <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 40, padding: "48px 0 40px", alignItems: "center" }}>
         <div style={{ opacity: ready ? 1 : 0, transform: ready ? "translateX(0)" : "translateX(-20px)", transition: "all 0.8s cubic-bezier(.22,1,.36,1)" }}>
           <Tag color={D.copper}>{t("Cross-Border Compensation Intelligence", "跨境薪酬情報平台")}</Tag>
-          <h1 style={{ fontSize: 42, fontWeight: 400, color: D.tx, lineHeight: 1.25, fontFamily: "'DM Mono','Noto Sans TC',monospace", marginTop: 16, letterSpacing: -0.5 }}>
-            {t("Global crypto", "跨國加密貨幣")}<br />
-            {t("compensation,", "薪酬情報，")}<br />
-            <span style={{ color: D.slate }}>{t("decoded.", "全面解碼。")}</span>
+          <h1 style={{ fontSize: 42, fontWeight: 400, color: D.tx, lineHeight: 1.25, fontFamily: "'DM Mono','Noto Sans TC',monospace", marginTop: 16, letterSpacing: 0 }}>
+            {t("Compare salaries", "比較 12 國薪酬，")}<br />
+            {t("across 12 countries.", "算出到手薪資，")}<br />
+            <span style={{ color: D.slate }}>{t("Make smarter offers.", "模擬代幣歸屬稅務。")}</span>
           </h1>
           <p style={{ fontSize: 15, color: D.tx3, lineHeight: 1.85, marginTop: 20, maxWidth: 420 }}>
             {t(
-              "Total comp structures, labor regulations, leave policies, and public holidays across 12 crypto jurisdictions. Built by cross-border C&B practitioners.",
-              "總薪酬結構、勞動法規、假別制度與行事曆。橫跨12個加密貨幣管轄區，由跨境薪酬福利實務專家打造。"
+              "Hiring across borders? Get market salary ranges, take-home pay after tax, and token vesting simulations — across 12 crypto jurisdictions, in seconds.",
+              "在跨國招募或調薪時，不確定市場行情？這裡有 12 個國家的薪資帶寬、稅後到手試算、代幣歸屬模擬，讓你開出有競爭力的 Offer。"
             )}
           </p>
           <div style={{ display: "flex", gap: 10, marginTop: 28 }}>
             <button onClick={() => setTab("totalcomp")} style={{ background: D.ink, color: "#fff", border: "none", padding: "10px 24px", borderRadius: 6, cursor: "pointer", fontSize: 14, fontWeight: 500, fontFamily: "'DM Mono',monospace", letterSpacing: 0.3 }}>
-              {t("Explore Total Comp", "探索總薪酬")}
+              {t("Compare Comp Packages", "比較薪酬套餐")}
             </button>
             <button onClick={() => setTab("labor")} style={{ background: "transparent", color: D.tx2, border: `1px solid rgba(0,0,0,0.06)`, padding: "10px 24px", borderRadius: 6, cursor: "pointer", fontSize: 14, fontWeight: 500, fontFamily: "'DM Mono',monospace" }}>
-              {t("Labor Law Compare", "勞動法規對比")}
+              {t("Compare Labor Laws", "比較勞動法規")}
             </button>
           </div>
         </div>
@@ -57,50 +60,92 @@ export default function Home({ selC, togC, setTab, ready, t }) {
       {/* Stats bar */}
       <div style={{ display: "grid", gridTemplateColumns: "repeat(5, 1fr)", gap: 16, padding: "28px 0", borderTop: `1px solid rgba(0,0,0,0.06)`, borderBottom: `1px solid rgba(0,0,0,0.06)` }}>
         {[
-          { v: "12", l: t("Countries", "國家"), c: D.slate },
-          { v: "480", l: t("Roles", "職位"), c: D.sage },
-          { v: "10", l: t("Levels", "職等"), c: D.copper },
-          { v: "10", l: t("Leave Types", "假別"), c: D.clay },
-          { v: "471", l: t("Exchanges", "交易所"), c: D.wine },
+          { v: "12", l: t("Countries covered", "覆蓋國家"), sub: t("incl. SG, AE, HK, JP", "含新加坡・阿聯酋・香港・日本"), c: D.slate },
+          { v: "480", l: t("Job Roles", "職位資料"), sub: t("across 12 job families", "12 大職能族群"), c: D.copper },
+          { v: "10", l: t("Career Levels", "職等層級"), sub: t("IC1–5 & M1–5 tracks", "IC 雙軌各 5 級"), c: D.slate },
+          { v: "10", l: t("Leave Types", "假別類型"), sub: t("annual, sick, parental…", "年假・病假・育嬰…"), c: D.copper },
+          { v: "471", l: t("Exchanges tracked", "交易所追蹤"), sub: t("global crypto benchmarks", "全球加密市場基準"), c: D.slate },
         ].map((s, i) => (
           <div key={i} style={{ textAlign: "center", opacity: ready ? 1 : 0, transition: `all 0.5s ease ${0.4 + i * 0.08}s` }}>
-            <Num value={s.v} color={s.c} size={30} />
-            <div style={{ fontSize: 12, color: D.tx4, letterSpacing: 1.5, fontWeight: 500, fontFamily: "'DM Mono',monospace", marginTop: 5 }}>{s.l}</div>
+            <Num value={s.v} color={s.c} size={36} />
+            <div style={{ fontSize: 12, color: D.tx2, letterSpacing: 1, fontWeight: 600, fontFamily: "'DM Mono',monospace", marginTop: 6 }}>{s.l}</div>
+            <div style={{ fontSize: 11, color: D.tx4, marginTop: 3, lineHeight: 1.4 }}>{s.sub}</div>
           </div>
         ))}
       </div>
 
+      {/* How to use — 3 steps */}
+      <div style={{ margin: "36px 0 28px" }}>
+        <div style={{ fontSize: 11, fontWeight: 600, letterSpacing: 2.5, color: D.tx3, fontFamily: "'DM Mono',monospace", textTransform: "uppercase", marginBottom: 16 }}>
+          {t("How to use  ·  3 steps", "如何使用  ·  3 步驟")}
+        </div>
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 12 }}>
+          {[
+            {
+              step: "01",
+              title: t("Pick your countries", "選擇國家"),
+              desc: t("Click countries on the map (or use the selector) to compare up to 6 markets side by side.", "在地圖點選國家（最多 6 個），即可並排比較各市場薪酬數據。"),
+              c: D.slate,
+            },
+            {
+              step: "02",
+              title: t("Select role & level", "選定職位與職等"),
+              desc: t("Choose job family → subfunction → IC or Management track → level. Salary data updates instantly.", "選職能族群 → 子職能 → IC 或管理軌道 → 職等，薪資數據即時更新。"),
+              c: D.sage,
+            },
+            {
+              step: "03",
+              title: t("Read the results", "解讀結果"),
+              desc: t("See P25 / P50 / P75 salary ranges, take-home estimates, and cross-country rankings — all in one view.", "查看 P25 / P50 / P75 帶寬、稅後估算與跨國排名，一頁全覽。"),
+              c: D.copper,
+            },
+          ].map((step, i) => (
+            <div key={i} style={{ padding: "18px 20px", borderRadius: 10, background: `${step.c}10`, border: `1px solid ${step.c}25`, opacity: ready ? 1 : 0, transition: `all 0.5s ease ${0.3 + i * 0.08}s` }}>
+              <div style={{ fontSize: 28, fontWeight: 700, fontFamily: "'DM Mono',monospace", color: step.c, opacity: 0.3, lineHeight: 1, marginBottom: 10 }}>{step.step}</div>
+              <div style={{ fontSize: 14, fontWeight: 600, color: D.tx, fontFamily: "'DM Mono','Noto Sans TC',monospace", marginBottom: 8 }}>{step.title}</div>
+              <p style={{ fontSize: 13, color: D.tx3, lineHeight: 1.65, margin: 0 }}>{step.desc}</p>
+            </div>
+          ))}
+        </div>
+      </div>
+
       {/* Feature cards */}
-      <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 14, marginTop: 36 }}>
+      <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 14 }}>
         {[
           {
             t: t("Comp Structure", "薪酬結構拆解"),
-            d: t("Compare Base + Bonus + Token + ER Social + Allowance across countries. See which jurisdiction has the highest total employer cost.", "比較各國底薪・獎金・代幣・雇主社保・津貼組合。含代幣歸屬模擬器：4年時間表×3種價格情境。"),
+            scenario: t("Hiring a Singapore engineer? See the full employer cost breakdown.", "想雇用新加坡工程師，不確定雇主實際總成本是多少？"),
+            d: t("Compare base + bonus + token + social security + allowances side by side. Includes a 4-year token vesting simulator with 3 price scenarios.", "並排比較底薪・獎金・代幣・社保・津貼。含代幣歸屬模擬器：4年時間表 × 3 種價格情境。"),
             c: D.slate, go: "totalcomp",
           },
           {
             t: t("Salary Band Matrix", "薪資帶寬矩陣"),
-            d: t("P25 / P50 / P75 salary bands for 12 job families × 48 roles × IC & Management tracks × 12 countries. Includes Compa-Ratio checker.", "12職能族群×48子職能×雙軌道×12國的P25/P50/P75帶寬。含Compa-Ratio快速比較你的薪資位置。"),
-            c: D.sage, go: "salary",
+            scenario: t("Is a candidate's expected salary above or below market? Find out instantly.", "應徵者的期望薪資，是高於還是低於市場行情？"),
+            d: t("P25 / P50 / P75 salary ranges for 480 roles across 12 countries. Enter an actual salary to see its market position (Compa-Ratio).", "480 個職位在 12 國的 P25 / P50 / P75 帶寬。輸入實際薪資，立即得知市場位置（Compa-Ratio）。"),
+            c: D.slate, go: "salary",
           },
           {
             t: t("Cross-Border Relocation", "跨境調派規劃"),
-            d: t("From → To country planner: salary delta, take-home diff, employer cost, visa requirements & relocation budget in one card.", "選起始國→目的國，一張卡片顯示薪資差額、稅後對比、簽證費用與搬遷預算。"),
+            scenario: t("Relocating an employee from Taiwan to Dubai — what changes for their package?", "員工從台灣派駐杜拜，薪酬套餐會怎麼變？"),
+            d: t("From → To planner: salary delta, take-home difference, employer cost, visa requirements, and relocation budget — all in one card.", "起始國→目的國：薪差、稅後變化、雇主成本、簽證費與搬遷預算，一張卡片完整呈現。"),
             c: D.copper, go: "relocate",
           },
           {
             t: t("Take-Home Calculator", "到手薪資試算"),
-            d: t("Enter any gross salary → see net pay after income tax + social security in all 12 countries side by side. AE = 0% tax.", "輸入毛薪，即時比較12國稅後到手。阿聯酋0%稅，日本扣近50%，差距一目瞭然。"),
-            c: D.clay, go: "netpay",
+            scenario: t("Same gross salary, but how much does the employee actually pocket in each country?", "同樣的毛薪，在不同國家員工實際到手多少？"),
+            d: t("Enter any gross salary → compare net pay after income tax + social security across all 12 countries. UAE = 0% tax. Japan ≈ 50% deduction.", "輸入毛薪，即時比較 12 國稅後到手。阿聯酋 0% 稅，日本扣近 50%，差距一目瞭然。"),
+            c: D.slate, go: "netpay",
           },
           {
             t: t("Labor Law Matrix", "勞動法規矩陣"),
-            d: t("20 categories across 5 dimensions — leave, probation, severance, social security, termination. Sticky country compare table.", "5大維度×20項類別並列對比，含年假天數、產假週數、資遣費公式、加班費率等。"),
-            c: D.wine, go: "labor",
+            scenario: t("Terminating an employee in the Philippines — what are the legal requirements?", "在菲律賓要資遣員工，法定義務是什麼？"),
+            d: t("20 categories across 5 dimensions: leave, probation, severance, social security, termination. Any countries compared side by side.", "5大維度×20項類別並列對比，含年假天數、產假週數、資遣費公式、加班費率等。"),
+            c: D.slate, go: "labor",
           },
           {
             t: t("Holiday Calendar", "假日行事曆"),
-            d: t("3 views: Attendance matrix, monthly calendar, year comparison. 2025–2027 verified holiday database with type tags.", "3種模式：考勤矩陣・月曆・跨年對比。2025–2027官方假日資料庫，含假日類型標記。"),
+            scenario: t("Planning a cross-country launch — when is everyone actually at work?", "規劃跨國上線日期，哪天各地都有上班？"),
+            d: t("3 views: attendance matrix, monthly calendar, year comparison. Verified 2025–2027 holiday database with holiday type tags.", "3種模式：考勤矩陣・月曆・跨年對比。2025–2027 官方假日資料庫，含假日類型標記。"),
             c: D.tx3, go: "calendar",
           },
         ].map((f, i) => (
@@ -108,6 +153,10 @@ export default function Home({ selC, togC, setTab, ready, t }) {
             <div style={{ padding: "20px 18px" }}>
               <div style={{ width: 24, height: 2, borderRadius: 2, background: f.c, opacity: 0.4, marginBottom: 14 }} />
               <div style={{ fontSize: 16, fontWeight: 500, color: D.tx, fontFamily: "'DM Mono','Noto Sans TC',monospace" }}>{f.t}</div>
+              {/* Use case scenario — one plain-language sentence */}
+              <div style={{ fontSize: 12, color: f.c, fontStyle: "italic", marginTop: 8, lineHeight: 1.55, paddingLeft: 10, borderLeft: `2px solid ${f.c}40` }}>
+                {f.scenario}
+              </div>
               <p style={{ fontSize: 13, color: D.tx3, marginTop: 8, lineHeight: 1.65 }}>{f.d}</p>
               <div style={{ marginTop: 14, fontSize: 13, color: f.c, fontWeight: 500, fontFamily: "'DM Mono',monospace" }}>{t("Explore →", "前往 →")}</div>
             </div>

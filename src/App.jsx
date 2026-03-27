@@ -11,6 +11,7 @@ import Countries from "./modules/Countries.jsx";
 import Relocation from "./modules/Relocation.jsx";
 import GrossToNet from "./modules/GrossToNet.jsx";
 import Markets from "./modules/Markets.jsx";
+import AllowancePlanner from "./modules/AllowancePlanner.jsx";
 
 // Data
 import { FAMS } from "./data/jobs.js";
@@ -23,39 +24,42 @@ import { FAMS } from "./data/jobs.js";
 */
 
 const D = {
-  bg: "#eae8e4", surface: "#faf9f7", surfA: "rgba(250,249,247,0.72)", elev: "rgba(255,254,252,0.88)",
-  tx: "#1c1c1f", tx2: "#4a4a52", tx3: "#7d7d88", tx4: "#a8a8b4", tx5: "#c8c8d0",
-  ink: "#2d3142", slate: "#546378", sage: "#5f7a61", copper: "#96714a", clay: "#a06b52", wine: "#8a5565",
-  ln: "rgba(0,0,0,0.06)", lnF: "rgba(0,0,0,0.03)",
+  bg: "#f4f6f8", surface: "#ffffff", surfA: "rgba(255,255,255,0.95)", elev: "rgba(255,255,255,0.98)",
+  tx:  "#111827", tx2: "#1f2937", tx3: "#4b5563", tx4: "#9ca3af", tx5: "#d1d5db",
+  ink: "#111827", slate: "#1a56db", sage: "#0ea5e9", copper: "#f59e0b", clay: "#ef4444", wine: "#8b5cf6",
+  ln:  "rgba(15,23,42,0.08)", lnF: "rgba(15,23,42,0.04)",
+  surface2: "#ffffff",
 };
 
 const BG = () => (
   <div style={{ position: "fixed", inset: 0, zIndex: 0, pointerEvents: "none" }}>
-    <div style={{ position: "absolute", inset: 0, background: "linear-gradient(160deg,#ece9e3 0%,#f0eeea 35%,#efede8 65%,#ece9e4 100%)" }} />
-    <div style={{ position: "absolute", inset: 0, opacity: 0.3, backgroundImage: `linear-gradient(${D.slate}05 1px,transparent 1px),linear-gradient(90deg,${D.slate}05 1px,transparent 1px)`, backgroundSize: "48px 48px" }} />
-    <div style={{ position: "absolute", top: "-10%", right: "-5%", width: 600, height: 600, background: `radial-gradient(circle,${D.slate}05 0%,transparent 55%)`, borderRadius: "50%", filter: "blur(80px)" }} />
-    <div style={{ position: "absolute", bottom: "-5%", left: "10%", width: 400, height: 400, background: `radial-gradient(circle,${D.sage}04 0%,transparent 55%)`, borderRadius: "50%", filter: "blur(80px)" }} />
+    <div style={{ position: "absolute", inset: 0, background: "linear-gradient(160deg,#f4f6f8 0%,#f5f7fb 35%,#f2f6fa 65%,#f0f4f8 100%)" }} />
+    <div style={{ position: "absolute", inset: 0, opacity: 0.08, backgroundImage: `linear-gradient(${D.slate}08 1px,transparent 1px),linear-gradient(90deg,${D.slate}08 1px,transparent 1px)`, backgroundSize: "48px 48px" }} />
+    <div style={{ position: "absolute", top: "-10%", right: "-5%", width: 600, height: 600, background: `radial-gradient(circle,${D.slate}06 0%,transparent 55%)`, borderRadius: "50%", filter: "blur(80px)" }} />
+    <div style={{ position: "absolute", bottom: "-5%", left: "10%", width: 400, height: 400, background: `radial-gradient(circle,${D.copper}05 0%,transparent 55%)`, borderRadius: "50%", filter: "blur(80px)" }} />
   </div>
 );
 
 // ═══════ HEADER (module-level to prevent remount on every App render) ═══════
 const AppHeader = memo(function AppHeader({ tab, setTab, setDetail, usdt, setUsdt, lang, setLang, t, TABS }) {
   return (
-    <header style={{ position: "sticky", top: 0, zIndex: 100, background: "rgba(240,238,234,0.75)", backdropFilter: "blur(24px)", borderBottom: `1px solid rgba(0,0,0,0.04)` }}>
+    <header style={{ position: "sticky", top: 0, zIndex: 100, background: "rgba(240,244,248,0.88)", backdropFilter: "blur(24px)", borderBottom: `1px solid rgba(15,23,42,0.08)` }}>
       <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", maxWidth: 1360, margin: "0 auto", height: 58, padding: "0 28px" }}>
         <div style={{ display: "flex", alignItems: "center", gap: 6, cursor: "pointer" }} onClick={() => { setTab("home"); setDetail(null); }}>
-          <span style={{ fontSize: 18, fontWeight: 500, fontFamily: "'DM Mono',monospace", color: D.ink, letterSpacing: 2 }}>
+          <span style={{ fontSize: 20, fontWeight: 700, fontFamily: "'DM Mono',monospace", color: D.ink, letterSpacing: 2 }}>
             Pay<span style={{ color: D.slate }}>band</span>
           </span>
         </div>
         <nav style={{ display: "flex", gap: 1, overflowX: "auto", msOverflowStyle: "none", scrollbarWidth: "none", flex: 1, margin: "0 16px" }}>
           <style>{`::-webkit-scrollbar{display:none}`}</style>
-          {TABS.map(i => (
+          {TABS.map((i, idx) => i.sep
+            ? <div key={`sep-${idx}`} style={{ width: 1, height: 18, background: "rgba(15,23,42,0.12)", margin: "0 4px", alignSelf: "center", flexShrink: 0 }} />
+            : (
             <button key={i.id} onClick={() => { setTab(i.id); setDetail(null); }} style={{
               background: "transparent", border: "none",
               color: tab === i.id ? D.tx : D.tx4,
               padding: "6px 12px", cursor: "pointer",
-              fontSize: 13, fontWeight: tab === i.id ? 500 : 400,
+              fontSize: 13, fontWeight: tab === i.id ? 700 : 400,
               fontFamily: "'DM Mono','Noto Sans TC',monospace",
               borderBottom: tab === i.id ? `2px solid ${D.slate}` : "2px solid transparent",
               transition: "all 0.2s", whiteSpace: "nowrap", flexShrink: 0,
@@ -106,14 +110,18 @@ export default function App() {
 
   const TABS = [
     { id: "home",       e: "Home",            z: "首頁" },
+    { sep: true },
     { id: "salary",     e: "Salary Matrix",   z: "薪資帶寬" },
     { id: "totalcomp",  e: "Comp Structure",  z: "薪酬結構" },
     { id: "relocate",   e: "Cross-Border",    z: "跨境調派" },
     { id: "netpay",     e: "Take-Home",       z: "到手試算" },
+    { id: "allowance",  e: "Allowances",      z: "津貼規劃" },
     { id: "markets",    e: "FX & Crypto",     z: "匯率與幣市" },
+    { sep: true },
     { id: "labor",      e: "Labor Law",       z: "勞動法規" },
     { id: "calendar",   e: "Holidays",        z: "假日行事曆" },
     { id: "regulation", e: "Reg Tracker",     z: "監管動態" },
+    { sep: true },
     { id: "countries",  e: "Country Files",   z: "國家檔案" },
   ];
 
@@ -122,9 +130,9 @@ export default function App() {
   };
 
   return (
-    <div style={{ minHeight: "100vh", color: D.tx, position: "relative", fontFamily: "'DM Mono','Noto Sans TC',monospace", fontSize: 16 }}>
+    <div style={{ minHeight: "100vh", color: D.tx, position: "relative", fontFamily: "'Inter','Noto Sans TC',sans-serif", fontSize: 15, fontWeight: 400, lineHeight: 1.65 }}>
       <style>{`
-*{box-sizing:border-box;margin:0;padding:0}::selection{background:${D.slate}18}::-webkit-scrollbar{width:5px;height:5px}::-webkit-scrollbar-track{background:transparent}::-webkit-scrollbar-thumb{background:rgba(0,0,0,0.1);border-radius:4px}input::placeholder{color:${D.tx4}}table tr:hover{background:${D.slate}03!important}button{font-family:inherit}
+*{box-sizing:border-box;margin:0;padding:0}body{-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale;font-family:'Inter','Noto Sans TC',sans-serif}::selection{background:${D.slate}22}::-webkit-scrollbar{width:5px;height:5px}::-webkit-scrollbar-track{background:transparent}::-webkit-scrollbar-thumb{background:rgba(15,23,42,0.12);border-radius:4px}input::placeholder{color:${D.tx4}}table tr:hover{background:${D.slate}06!important}button{font-family:'Inter','Noto Sans TC',sans-serif}p,span,td,th,li{line-height:1.65}.mono{font-family:'DM Mono',monospace!important}
       `}</style>
       <BG />
       <div style={{ position: "relative", zIndex: 1 }}>
@@ -155,6 +163,9 @@ export default function App() {
           )}
           {tab === "netpay" && (
             <GrossToNet lang={lang} t={t} />
+          )}
+          {tab === "allowance" && (
+            <AllowancePlanner lang={lang} t={t} />
           )}
           {tab === "labor" && (
             <LaborLaw selC={selC} togC={togC} lang={lang} t={t} />

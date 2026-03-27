@@ -3,10 +3,19 @@ import Card from "../components/Card.jsx";
 import { COUNTRIES } from "../data/countries.js";
 
 const D = {
-  tx: "#1c1c1f", tx2: "#4a4a52", tx3: "#7d7d88", tx4: "#a8a8b4",
-  lnF: "rgba(0,0,0,0.03)", ln: "rgba(0,0,0,0.06)",
-  ink: "#2d3142", slate: "#546378", sage: "#5f7a61", copper: "#96714a",
-  clay: "#a06b52", wine: "#8a5565", surface: "#faf9f7",
+  tx:  "#0f172a",
+  tx2: "#1e293b",
+  tx3: "#475569",
+  tx4: "#94a3b8",
+  lnF: "rgba(15,23,42,0.04)",
+  ln:  "rgba(15,23,42,0.08)",
+  ink: "#0f172a",
+  slate:  "#1a56db",
+  sage:   "#059669",
+  copper: "#f59e0b",
+  clay:   "#dc2626",
+  wine:   "#7c3aed",
+  surface:"#f8fafc",
 };
 
 // ── Tax bracket helper ──────────────────────────────────────────────────────
@@ -83,7 +92,9 @@ function calcNet(cid, gross) {
         [280000, 320000, 0.20], [320000, 500000, 0.22],
         [500000, 1000000, 0.23], [1000000, Infinity, 0.24],
       ]);
-      social = Math.min(gross, 88800) * 0.20; // CPF OW cap SGD 7,400/mo × 12 (2025)
+      // CPF: OW ceiling SGD 7,400/mo; AW ceiling SGD 102,000/yr (~USD 75,500 at 1.35)
+      // Employee rate 20% (age ≤55). Cap at USD 75,500 to reflect annual wage ceiling.
+      social = Math.min(gross, 75500) * 0.20;
       break;
     }
     case "hk": {
@@ -95,7 +106,9 @@ function calcNet(cid, gross) {
         [104000, 156000, 0.10], [156000, Infinity, 0.14],
       ]);
       income = Math.min(progressive, gross * 0.15);
-      social = Math.min(gross, 19500) * 0.05; // MPF 5% capped
+      // MPF: 5% employee; relevant income ceiling HKD 30,000/mo = HKD 360,000/yr ≈ USD 46,000
+      // Max annual contribution ≈ USD 2,300
+      social = Math.min(gross, 46000) * 0.05;
       break;
     }
     case "jp": {
@@ -121,8 +134,8 @@ function calcNet(cid, gross) {
       break;
     }
     case "tw": {
-      // Progressive after basic deductions ≈ TWD 400K = ~USD 13K
-      const taxable = Math.max(gross - 13000, 0);
+      // TWD deductions: standard TWD 124K + salary special TWD 207K + exemption TWD 92K = ~TWD 423K ≈ USD 14,000
+      const taxable = Math.max(gross - 14000, 0);
       income = calcBrackets(taxable, [
         [0, 19000, 0.05], [19000, 54000, 0.12], [54000, 109000, 0.20],
         [109000, 205000, 0.30], [205000, Infinity, 0.40],
@@ -275,6 +288,19 @@ export default function GrossToNet({ lang, t }) {
         </div>
       </Card>
 
+      {/* ── PLAIN-LANGUAGE INTRO ───────────────────────── */}
+      <div style={{ padding: "14px 18px", borderRadius: 10, background: "rgba(84,99,120,0.05)", border: "1px solid rgba(84,99,120,0.12)", marginBottom: 14 }}>
+        <div style={{ fontSize: 13, fontWeight: 600, color: D.slate, fontFamily: "'DM Mono','Noto Sans TC',monospace", marginBottom: 4 }}>
+          {t("What this shows", "這個圖表告訴你什麼")}
+        </div>
+        <div style={{ fontSize: 13, color: D.tx2, lineHeight: 1.7 }}>
+          {t(
+            "Enter an annual salary and see how much employees actually take home after income tax and social security in each country. Same gross pay — very different real purchasing power.",
+            "輸入年薪，看看同樣的錢在不同國家員工實際能拿到多少。相同的毛薪——在不同地點的實質購買力差距可能超乎預期。"
+          )}
+        </div>
+      </div>
+
       {/* ── BAR CHART ──────────────────────────────── */}
       <Card glow style={{ marginBottom: 14 }}>
         <div style={{ padding: "18px 20px" }}>
@@ -327,6 +353,51 @@ export default function GrossToNet({ lang, t }) {
           ))}
         </div>
       </Card>
+
+      {/* ── KEY INSIGHTS CARD ──────────────────────── */}
+      {(() => {
+        const byNet     = [...results].sort((a, b) => b.net - a.net);
+        const byEff     = [...results].sort((a, b) => a.eff - b.eff);
+        const topNet    = byNet[0];
+        const topNetPct = gross > 0 ? Math.round(topNet.net / gross * 100) : 0;
+        const top3Low   = byEff.slice(0, 3);
+        const maxNet2   = byNet[0].net;
+        const minNet    = byNet[byNet.length - 1].net;
+        const diffNet   = maxNet2 - minNet;
+        const grossK    = Math.round(gross / 1000);
+        return (
+          <Card glow style={{ marginBottom: 14, border: "1px solid rgba(5,150,105,0.18)", background: "rgba(5,150,105,0.03)" }}>
+            <div style={{ padding: "16px 20px" }}>
+              <div style={{ fontSize: 11, fontWeight: 600, letterSpacing: 2.5, color: D.sage, fontFamily: "'DM Mono',monospace", textTransform: "uppercase", marginBottom: 14 }}>
+                🔍 {t("Key Insights", "重點發現")}
+              </div>
+              <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+                <div style={{ padding: "10px 14px", borderRadius: 8, background: "rgba(5,150,105,0.06)", border: "1px solid rgba(5,150,105,0.15)", fontSize: 13, color: D.tx2 }}>
+                  🏆 {t(
+                    `Best take-home: ${topNet.c.flag} ${t(topNet.c.n, topNet.c.zh)} — on $${grossK}K gross, employee keeps $${Math.round(topNet.net / 1000)}K (${topNetPct}% retention rate)`,
+                    `最高到手：${topNet.c.flag} ${t(topNet.c.n, topNet.c.zh)} — 同樣 $${grossK}K 毛薪，到手 $${Math.round(topNet.net / 1000)}K（${topNetPct}% 保留率）`
+                  )}
+                </div>
+                <div style={{ padding: "10px 14px", borderRadius: 8, background: "rgba(37,99,235,0.05)", border: "1px solid rgba(37,99,235,0.12)", fontSize: 13, color: D.tx2 }}>
+                  📉 {t("Lowest tax burden — Top 3:", "最低稅負 — 前三名：")}
+                  {" "}
+                  {top3Low.map((r, i) => (
+                    <span key={r.c.id}>
+                      {r.c.flag} <strong>{t(r.c.n, r.c.zh)}</strong> ({Math.round(r.eff * 100)}%){i < 2 ? "、" : ""}
+                    </span>
+                  ))}
+                </div>
+                <div style={{ padding: "10px 14px", borderRadius: 8, background: "rgba(220,38,38,0.05)", border: "1px solid rgba(220,38,38,0.12)", fontSize: 13, color: D.tx2 }}>
+                  ⚡ {t(
+                    `Largest take-home gap: $${Math.round(diffNet / 1000)}K difference between best and worst — employee experience of "the same offer" varies dramatically by location.`,
+                    `最高與最低到手差距：$${Math.round(diffNet / 1000)}K — 同一份 offer 在不同地點員工的實質感受差異極大，薪酬設計時需考量員工體感。`
+                  )}
+                </div>
+              </div>
+            </div>
+          </Card>
+        );
+      })()}
 
       {/* ── DETAILED TABLE ─────────────────────────── */}
       <Card glow>
@@ -387,7 +458,10 @@ export default function GrossToNet({ lang, t }) {
                       <span style={{ fontSize: 16, fontWeight: 700, fontFamily: "'DM Mono',monospace", color: D.sage }}>{fmtAmt(r.net)}</span>
                     </td>
                     <td style={{ padding: "10px 12px", textAlign: "center", borderLeft: `1px solid ${D.lnF}` }}>
-                      <span style={{ fontSize: 13, fontWeight: 600, fontFamily: "'DM Mono',monospace", color: r.eff < 0.2 ? D.sage : r.eff > 0.4 ? D.clay : D.copper }}>
+                      <span
+                        style={{ fontSize: 13, fontWeight: 600, fontFamily: "'DM Mono',monospace", color: r.eff <= 0.20 ? D.sage : r.eff > 0.35 ? D.clay : D.copper }}
+                        title={r.eff <= 0.20 ? t("Low burden ≤20%","低稅負 ≤20%") : r.eff > 0.35 ? t("High burden >35%","高稅負 >35%") : t("Moderate burden 20–35%","中等稅負 20–35%")}
+                      >
                         {Math.round(r.eff * 100)}%
                       </span>
                     </td>
@@ -408,6 +482,12 @@ export default function GrossToNet({ lang, t }) {
         <div style={{ padding: "10px 16px", borderTop: `1px solid ${D.lnF}`, fontSize: 11, color: D.tx4, lineHeight: 1.5 }}>
           ⚠️ {t("Simplified models using 2024 rates. Does not include all deductions, credits, or surcharges. UAE has 0% income tax with no social security for foreign employees. Consult a tax professional for actual payroll planning.",
                "基於 2024 年稅率的簡化模型，未包含所有扣除額、抵稅額或附加稅。阿聯酋外籍員工享有0%所得稅且無社保。實際薪資規劃請諮詢稅務專業人士。")}
+        </div>
+        <div style={{ padding: "10px 16px", borderTop: `1px solid ${D.lnF}`, fontSize: 12, color: D.sage, lineHeight: 1.6, background: "rgba(5,150,105,0.04)" }}>
+          💡 {t(
+            "Design tip: For high-salary roles ($150K+), after-tax experience in AE / HK / SG far exceeds Europe and Japan. This is a key retention advantage for crypto companies hiring global talent.",
+            "設計建議：對高薪職位（$150K+），AE/HK/SG 的稅後感受遠超歐日，是加密公司吸引並留住國際人才的重要工具。"
+          )}
         </div>
       </Card>
     </div>

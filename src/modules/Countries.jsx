@@ -6,16 +6,19 @@ import { JLVL, FAMS } from "../data/jobs.js";
 import { gS, fmt } from "../utils/salary.js";
 
 const D = {
-  tx: "#1c1c1f",
-  tx2: "#4a4a52",
-  tx3: "#7d7d88",
-  tx4: "#a8a8b4",
-  lnF: "rgba(0,0,0,0.03)",
-  ln: "rgba(0,0,0,0.06)",
-  slate: "#546378",
-  sage: "#5f7a61",
-  copper: "#96714a",
-  clay: "#a06b52",
+  tx:  "#0f172a",
+  tx2: "#1e293b",
+  tx3: "#475569",
+  tx4: "#94a3b8",
+  lnF: "rgba(15,23,42,0.04)",
+  ln:  "rgba(15,23,42,0.08)",
+  ink: "#0f172a",
+  slate:  "#1a56db",
+  sage:   "#059669",
+  copper: "#f59e0b",
+  clay:   "#dc2626",
+  wine:   "#7c3aed",
+  surface:"#f8fafc",
 };
 
 const LV = ["#9a9aa6", "#6b7fa0", "#7a6a9e", "#9a6878", "#96714a"];
