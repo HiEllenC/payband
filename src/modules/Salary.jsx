@@ -1,5 +1,6 @@
 import { useState } from "react";
 import Card from "../components/Card.jsx";
+import DataSources from "../components/DataSources.jsx";
 import WorldMap from "../components/WorldMap.jsx";
 import JobSelector from "../components/JobSelector.jsx";
 import { COUNTRIES } from "../data/countries.js";
@@ -425,6 +426,7 @@ export default function Salary({ selC, togC, selFam, setSelFam, selSub, setSelSu
           ))}
         </div>
       )}
+      <DataSources module="salary" t={t} lang={lang} />
     </div>
   );
 }

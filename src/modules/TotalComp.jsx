@@ -1,5 +1,6 @@
 import { useState } from "react";
 import Card from "../components/Card.jsx";
+import DataSources from "../components/DataSources.jsx";
 import WorldMap from "../components/WorldMap.jsx";
 import JobSelector from "../components/JobSelector.jsx";
 import { COUNTRIES } from "../data/countries.js";
@@ -377,6 +378,7 @@ export default function TotalComp({ selC, togC, selFam, setSelFam, selSub, setSe
         </div>
       )}
       </>)}
+      <DataSources module="totalcomp" t={t} lang={lang} />
     </div>
   );
 }

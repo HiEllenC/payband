@@ -1,5 +1,6 @@
 import { useState, useMemo } from "react";
 import Card from "../components/Card.jsx";
+import DataSources from "../components/DataSources.jsx";
 import { COUNTRIES } from "../data/countries.js";
 
 const D = {
@@ -490,6 +491,7 @@ export default function GrossToNet({ lang, t }) {
           )}
         </div>
       </Card>
+      <DataSources module="netpay" t={t} lang={lang} />
     </div>
   );
 }

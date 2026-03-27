@@ -1,4 +1,5 @@
 import Card from "../components/Card.jsx";
+import DataSources from "../components/DataSources.jsx";
 import { COUNTRIES } from "../data/countries.js";
 
 const D = {
@@ -185,6 +186,7 @@ export default function LaborLaw({ selC, togC, lang, t }) {
           </table>
         </div>
       </Card>
+      <DataSources module="labor" t={t} lang={lang} />
     </div>
   );
 }
