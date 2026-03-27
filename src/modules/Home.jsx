@@ -33,14 +33,14 @@ export default function Home({ selC, togC, setTab, ready, t, lang = "zh" }) {
         <div style={{ opacity: ready ? 1 : 0, transform: ready ? "translateX(0)" : "translateX(-20px)", transition: "all 0.8s cubic-bezier(.22,1,.36,1)" }}>
           <Tag color={D.copper}>{t("Cross-Border Compensation Intelligence", "跨境薪酬情報平台")}</Tag>
           <h1 style={{ fontSize: 42, fontWeight: 600, color: D.tx, lineHeight: 1.25, fontFamily: "'DM Mono','Noto Sans TC',monospace", marginTop: 16, letterSpacing: 0 }}>
-            {t("Compare salaries", "比較 12 國薪酬，")}<br />
-            {t("across 12 countries.", "算出到手薪資，")}<br />
-            <span style={{ color: D.slate }}>{t("Make smarter offers.", "模擬代幣歸屬稅務。")}</span>
+            {t("Cross-border hiring &", "加密業跨境招募、")}<br />
+            {t("comp design for crypto teams —", "薪酬設計、留才策略，")}<br />
+            <span style={{ color: D.slate }}>{t("real exchange data, 12 markets.", "以交易所真實數據為本。")}</span>
           </h1>
           <p style={{ fontSize: 15, color: D.tx3, lineHeight: 1.85, marginTop: 20, maxWidth: 420 }}>
             {t(
-              "Hiring across borders? Get market salary ranges, take-home pay after tax, and token vesting simulations — across 12 crypto jurisdictions, in seconds.",
-              "在跨國招募或調薪時，不確定市場行情？這裡有 12 個國家的薪資帶寬、稅後到手試算、代幣歸屬模擬，讓你開出有競爭力的 Offer。"
+              "Built for crypto exchange HR and C&B teams. Get salary benchmarks, take-home calculations, and labor law data across 12 markets — all sourced from real industry compensation data.",
+              "專為加密交易所 HR 與 C&B 打造。匯集業界真實薪酬數據，涵蓋 12 個市場、480 個職位，即時查詢薪資帶寬、稅後試算與勞動法規，讓每個跨境薪酬決策都有底氣。"
             )}
           </p>
           <div style={{ display: "flex", gap: 10, marginTop: 28 }}>

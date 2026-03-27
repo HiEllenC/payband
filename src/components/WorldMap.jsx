@@ -363,7 +363,7 @@ const IDS = Object.keys(CAPS);
 
 // ── Hero interactive map ──────────────────────────────────────────────────────
 // Crop polar dead-zones: show lat 65°N → 50°S only
-const HERO_TOP    = (90 - 65)  / 180 * H;   // y ≈  61
+const HERO_TOP    = (90 - 72)  / 180 * H;   // y ≈  44
 const HERO_BOTTOM = (90 - (-50)) / 180 * H; // y ≈ 344
 const HERO_VH     = HERO_BOTTOM - HERO_TOP; // ≈ 283
 

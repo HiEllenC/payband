@@ -44,8 +44,14 @@ const AppHeader = memo(function AppHeader({ tab, setTab, setDetail, usdt, setUsd
   return (
     <header style={{ position: "sticky", top: 0, zIndex: 100, background: "rgba(240,244,248,0.88)", backdropFilter: "blur(24px)", borderBottom: `1px solid rgba(15,23,42,0.08)` }}>
       <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", maxWidth: 1360, margin: "0 auto", height: 58, padding: "0 28px" }}>
-        <div style={{ display: "flex", alignItems: "center", gap: 6, cursor: "pointer" }} onClick={() => { setTab("home"); setDetail(null); }}>
-          <span style={{ fontSize: 20, fontWeight: 700, fontFamily: "'DM Mono',monospace", color: D.ink, letterSpacing: 2 }}>
+        <div style={{ display: "flex", alignItems: "center", gap: 9, cursor: "pointer" }} onClick={() => { setTab("home"); setDetail(null); }}>
+          {/* 3-bar salary band icon */}
+          <svg width="18" height="14" viewBox="0 0 18 14" fill="none" style={{ flexShrink: 0 }}>
+            <rect x="0" y="0"   width="18" height="3" rx="1.5" fill={D.slate} opacity="0.9" />
+            <rect x="0" y="5.5" width="12" height="3" rx="1.5" fill={D.slate} opacity="0.7" />
+            <rect x="0" y="11" width="7"  height="3" rx="1.5" fill={D.slate} opacity="0.5" />
+          </svg>
+          <span style={{ fontSize: 18, fontWeight: 700, fontFamily: "'DM Mono',monospace", color: D.ink, letterSpacing: 1.5 }}>
             i<span style={{ color: D.slate }}>Pay</span>band
           </span>
         </div>

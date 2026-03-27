@@ -15,7 +15,7 @@ const D = {
   ln:  "rgba(15,23,42,0.08)",
   ink: "#0f172a",
   slate:  "#1a56db",
-  sage:   "#059669",
+  sage:   "#0ea5e9",
   copper: "#f59e0b",
   clay:   "#dc2626",
   wine:   "#7c3aed",
@@ -68,8 +68,8 @@ function BandCell({ band, actual, color, usdt, lvlId, lang }) {
           }} />
         )}
       </div>
-      {/* P25 / P75 labels — visible on hover */}
-      <div style={{ display: "flex", justifyContent: "space-between", fontSize: 10, color: "#a8a8b4", fontFamily: "'DM Mono',monospace", opacity: hov ? 1 : 0, transition: "opacity 0.15s" }}>
+      {/* P25 / P75 labels — always visible, deepen on hover */}
+      <div style={{ display: "flex", justifyContent: "space-between", fontSize: 10, color: hov ? "#6b7280" : "#c4c9d4", fontFamily: "'DM Mono',monospace", transition: "color 0.15s" }}>
         <span>{fmt(band.p25, usdt)}</span>
         <span>{fmt(band.p75, usdt)}</span>
       </div>
@@ -201,6 +201,7 @@ export default function Salary({ selC, togC, selFam, setSelFam, selSub, setSelSu
           </div>
           <input
             type="number"
+            min="0"
             value={actualSalary}
             onChange={e => setActualSalary(e.target.value)}
             placeholder={t("e.g. 85 (USD K)", "例如 85（千美元）")}
@@ -267,7 +268,7 @@ export default function Salary({ selC, togC, selFam, setSelFam, selSub, setSelSu
               )}
               {isAtP25 && (
                 <div style={{ padding: "5px 12px", borderRadius: 20, background: "#fff8e1", border: "1px solid #ffd96a40", color: "#b7791f", fontSize: 11, fontWeight: 700, fontFamily: "'DM Mono','Noto Sans TC',monospace", whiteSpace: "nowrap" }}>
-                  {t("vs Market: Below Midpoint", "低於中位數 — 留才風險")}
+                  {t("vs Market: Below Midpoint", "市場對比：低於中位數 — 留才風險")}
                 </div>
               )}
             </div>
