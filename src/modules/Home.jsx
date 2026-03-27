@@ -1,6 +1,6 @@
 import Num from "../components/Num.jsx";
 import Card from "../components/Card.jsx";
-import WorldMap from "../components/WorldMap.jsx";
+import { WorldMapHero } from "../components/WorldMap.jsx";
 
 const D = {
   tx:  "#0f172a",
@@ -11,7 +11,7 @@ const D = {
   ln:  "rgba(15,23,42,0.08)",
   ink: "#0f172a",
   slate:  "#1a56db",
-  sage:   "#059669",
+  sage:   "#0ea5e9",
   copper: "#f59e0b",
   clay:   "#dc2626",
   wine:   "#7c3aed",
@@ -25,14 +25,14 @@ const Tag = ({ children, color = D.tx3 }) => (
 );
 
 // ═══════ HOME MODULE ═══════
-export default function Home({ selC, togC, setTab, ready, t }) {
+export default function Home({ selC, togC, setTab, ready, t, lang = "zh" }) {
   return (
     <div>
       {/* Hero section with map */}
-      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 40, padding: "48px 0 40px", alignItems: "center" }}>
+      <div style={{ display: "grid", gridTemplateColumns: "2fr 3fr", gap: 40, padding: "48px 0 40px", alignItems: "center" }}>
         <div style={{ opacity: ready ? 1 : 0, transform: ready ? "translateX(0)" : "translateX(-20px)", transition: "all 0.8s cubic-bezier(.22,1,.36,1)" }}>
           <Tag color={D.copper}>{t("Cross-Border Compensation Intelligence", "跨境薪酬情報平台")}</Tag>
-          <h1 style={{ fontSize: 42, fontWeight: 400, color: D.tx, lineHeight: 1.25, fontFamily: "'DM Mono','Noto Sans TC',monospace", marginTop: 16, letterSpacing: 0 }}>
+          <h1 style={{ fontSize: 42, fontWeight: 600, color: D.tx, lineHeight: 1.25, fontFamily: "'DM Mono','Noto Sans TC',monospace", marginTop: 16, letterSpacing: 0 }}>
             {t("Compare salaries", "比較 12 國薪酬，")}<br />
             {t("across 12 countries.", "算出到手薪資，")}<br />
             <span style={{ color: D.slate }}>{t("Make smarter offers.", "模擬代幣歸屬稅務。")}</span>
@@ -53,7 +53,7 @@ export default function Home({ selC, togC, setTab, ready, t }) {
           </div>
         </div>
         <div style={{ opacity: ready ? 1 : 0, transform: ready ? "translateX(0)" : "translateX(20px)", transition: "all 0.8s cubic-bezier(.22,1,.36,1) 0.2s" }}>
-          <WorldMap static />
+          <WorldMapHero lang={lang} />
         </div>
       </div>
 
@@ -61,9 +61,9 @@ export default function Home({ selC, togC, setTab, ready, t }) {
       <div style={{ display: "grid", gridTemplateColumns: "repeat(5, 1fr)", gap: 16, padding: "28px 0", borderTop: `1px solid rgba(0,0,0,0.06)`, borderBottom: `1px solid rgba(0,0,0,0.06)` }}>
         {[
           { v: "12", l: t("Countries covered", "覆蓋國家"), sub: t("incl. SG, AE, HK, JP", "含新加坡・阿聯酋・香港・日本"), c: D.slate },
-          { v: "480", l: t("Job Roles", "職位資料"), sub: t("across 12 job families", "12 大職能族群"), c: D.copper },
-          { v: "10", l: t("Career Levels", "職等層級"), sub: t("IC1–5 & M1–5 tracks", "IC 雙軌各 5 級"), c: D.slate },
-          { v: "10", l: t("Leave Types", "假別類型"), sub: t("annual, sick, parental…", "年假・病假・育嬰…"), c: D.copper },
+          { v: "480", l: t("Job Roles", "職位資料"), sub: t("across 12 job families", "12 大職能族群"), c: D.slate },
+          { v: "10", l: t("Career Levels", "職等層級"), sub: t("IC1–5 & M1–5 tracks", "IC1–5 & M1–5 雙軌各 5 級"), c: D.slate },
+          { v: "10", l: t("Leave Types", "假別類型"), sub: t("annual, sick, parental…", "年假・病假・育嬰…"), c: D.slate },
           { v: "471", l: t("Exchanges tracked", "交易所追蹤"), sub: t("global crypto benchmarks", "全球加密市場基準"), c: D.slate },
         ].map((s, i) => (
           <div key={i} style={{ textAlign: "center", opacity: ready ? 1 : 0, transition: `all 0.5s ease ${0.4 + i * 0.08}s` }}>

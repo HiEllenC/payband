@@ -28,7 +28,6 @@ const D = {
   tx:  "#111827", tx2: "#1f2937", tx3: "#4b5563", tx4: "#9ca3af", tx5: "#d1d5db",
   ink: "#111827", slate: "#1a56db", sage: "#0ea5e9", copper: "#f59e0b", clay: "#ef4444", wine: "#8b5cf6",
   ln:  "rgba(15,23,42,0.08)", lnF: "rgba(15,23,42,0.04)",
-  surface2: "#ffffff",
 };
 
 const BG = () => (
@@ -139,7 +138,7 @@ export default function App() {
         <AppHeader tab={tab} setTab={setTab} setDetail={setDetail} usdt={usdt} setUsdt={setUsdt} lang={lang} setLang={setLang} t={t} TABS={TABS} />
         <main style={{ maxWidth: 1360, margin: "0 auto", padding: "20px 32px 48px" }}>
           {tab === "home" && (
-            <Home selC={selC} togC={togC} setTab={setTab} ready={ready} t={t} />
+            <Home selC={selC} togC={togC} setTab={setTab} ready={ready} t={t} lang={lang} />
           )}
           {tab === "salary" && (
             <Salary
