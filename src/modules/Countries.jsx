@@ -110,6 +110,9 @@ function CDetail({ c, onBack, usdt, lang, t }) {
           </div>
         </div>
       </Card>
+      <button onClick={onBack} style={{ background: "none", border: `1px solid rgba(0,0,0,0.06)`, color: D.tx3, padding: "5px 14px", borderRadius: 4, cursor: "pointer", fontSize: 13, fontWeight: 500, marginTop: 16, fontFamily: "'DM Mono',monospace" }}>
+        ← {t("Back to Country List", "返回國家列表")}
+      </button>
     </div>
   );
 }

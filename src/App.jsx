@@ -1,17 +1,17 @@
-import { useState, useEffect, useCallback, memo } from "react";
+import { useState, useEffect, useCallback, memo, lazy, Suspense } from "react";
 
-// Modules
-import Home from "./modules/Home.jsx";
-import Salary from "./modules/Salary.jsx";
-import TotalComp from "./modules/TotalComp.jsx";
-import LaborLaw from "./modules/LaborLaw.jsx";
-import Calendar from "./modules/Calendar.jsx";
-import Regulation from "./modules/Regulation.jsx";
-import Countries from "./modules/Countries.jsx";
-import Relocation from "./modules/Relocation.jsx";
-import GrossToNet from "./modules/GrossToNet.jsx";
-import Markets from "./modules/Markets.jsx";
-import AllowancePlanner from "./modules/AllowancePlanner.jsx";
+// Modules — lazy loaded for code splitting
+const Home          = lazy(() => import("./modules/Home.jsx"));
+const Salary        = lazy(() => import("./modules/Salary.jsx"));
+const TotalComp     = lazy(() => import("./modules/TotalComp.jsx"));
+const LaborLaw      = lazy(() => import("./modules/LaborLaw.jsx"));
+const Calendar      = lazy(() => import("./modules/Calendar.jsx"));
+const Regulation    = lazy(() => import("./modules/Regulation.jsx"));
+const Countries     = lazy(() => import("./modules/Countries.jsx"));
+const Relocation    = lazy(() => import("./modules/Relocation.jsx"));
+const GrossToNet    = lazy(() => import("./modules/GrossToNet.jsx"));
+const Markets       = lazy(() => import("./modules/Markets.jsx"));
+const AllowancePlanner = lazy(() => import("./modules/AllowancePlanner.jsx"));
 
 // Data
 import { FAMS } from "./data/jobs.js";
@@ -89,7 +89,7 @@ const AppHeader = memo(function AppHeader({ tab, setTab, setDetail, usdt, setUsd
 // ═══════ MAIN APP ═══════
 export default function App() {
   const [tab, setTab] = useState("home");
-  const [selC, setSelC] = useState(["us", "sg", "ae"]);
+  const [selC, setSelC] = useState(["sg", "tw", "ph"]);
   const [selFam, setSelFam] = useState("eng");
   const [selSub, setSelSub] = useState("be");
   const [track, setTrack] = useState("ic");
@@ -137,12 +137,13 @@ export default function App() {
   return (
     <div style={{ minHeight: "100vh", color: D.tx, position: "relative", fontFamily: "'Inter','Noto Sans TC',sans-serif", fontSize: 15, fontWeight: 400, lineHeight: 1.65 }}>
       <style>{`
-*{box-sizing:border-box;margin:0;padding:0}body{-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale;font-family:'Inter','Noto Sans TC',sans-serif}::selection{background:${D.slate}22}::-webkit-scrollbar{width:5px;height:5px}::-webkit-scrollbar-track{background:transparent}::-webkit-scrollbar-thumb{background:rgba(15,23,42,0.12);border-radius:4px}input::placeholder{color:${D.tx4}}table tr:hover{background:${D.slate}06!important}button{font-family:'Inter','Noto Sans TC',sans-serif}p,span,td,th,li{line-height:1.65}.mono{font-family:'DM Mono',monospace!important}
+*{box-sizing:border-box;margin:0;padding:0}body{-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale;font-family:'Inter','Noto Sans TC',sans-serif}::selection{background:${D.slate}22}::-webkit-scrollbar{width:5px;height:5px}::-webkit-scrollbar-track{background:transparent}::-webkit-scrollbar-thumb{background:rgba(15,23,42,0.12);border-radius:4px}input::placeholder{color:${D.tx4}}table tr:hover{background:${D.slate}06!important}button{font-family:'Inter','Noto Sans TC',sans-serif}p,span,td,th,li{line-height:1.65}.mono{font-family:'DM Mono',monospace!important}button:focus-visible,input:focus-visible,select:focus-visible{outline:2px solid ${D.slate};outline-offset:2px;border-radius:4px}
       `}</style>
       <BG />
       <div style={{ position: "relative", zIndex: 1 }}>
         <AppHeader tab={tab} setTab={setTab} setDetail={setDetail} usdt={usdt} setUsdt={setUsdt} lang={lang} setLang={setLang} t={t} TABS={TABS} />
         <main style={{ maxWidth: 1360, margin: "0 auto", padding: "20px 32px 48px" }}>
+          <Suspense fallback={<div style={{ padding: "48px 0", textAlign: "center", color: "#94a3b8", fontFamily: "'DM Mono',monospace", fontSize: 13 }}>Loading…</div>}>
           {tab === "home" && (
             <Home selC={selC} togC={togC} setTab={setTab} ready={ready} t={t} lang={lang} />
           )}
@@ -188,6 +189,7 @@ export default function App() {
               ready={ready} usdt={usdt} lang={lang} t={t}
             />
           )}
+          </Suspense>
         </main>
         <footer style={{ borderTop: `1px solid ${D.ln}`, padding: "14px 32px", textAlign: "center" }}>
           <span style={{ fontSize: 13, color: D.tx4 }}>Payband v1.1 · {t("Mock data · API pending", "模擬數據 · API待接")} · Ellen Chuang</span>

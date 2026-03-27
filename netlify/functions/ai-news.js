@@ -1,8 +1,28 @@
 // Netlify Function: proxy for Anthropic AI Daily News
 // Keeps the API key server-side, away from the browser bundle.
+
+// Simple in-process rate limit: max 10 calls per 60s window across all users.
+// Not a hard guarantee (serverless = multiple instances), but adds friction.
+const _calls = [];
+function isRateLimited() {
+  const now = Date.now();
+  const window = 60_000;
+  while (_calls.length && _calls[0] < now - window) _calls.shift();
+  if (_calls.length >= 10) return true;
+  _calls.push(now);
+  return false;
+}
+
 export default async (req) => {
   if (req.method !== "POST") {
     return new Response("Method Not Allowed", { status: 405 });
+  }
+
+  if (isRateLimited()) {
+    return new Response(JSON.stringify({ error: "Too many requests. Please wait a moment." }), {
+      status: 429,
+      headers: { "Content-Type": "application/json", "Retry-After": "60" },
+    });
   }
 
   const apiKey = process.env.ANTHROPIC_API_KEY;

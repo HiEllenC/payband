@@ -463,6 +463,22 @@ export default function Markets({ lang, t, usdt }) {
   return (
     <div style={{ fontFamily: FONT }}>
 
+      {/* ── Page header ── */}
+      <div style={{ marginBottom: 20 }}>
+        <div style={{ fontSize: 28, fontWeight: 500, color: D.tx, fontFamily: FONT, marginBottom: 6 }}>
+          {t("FX & Crypto Markets", "匯率與幣市")}
+        </div>
+        <div style={{ display: "flex", alignItems: "center", gap: 8, padding: "10px 14px", borderRadius: 8, background: `${D.slate}06`, border: `1px solid ${D.slate}18`, maxWidth: 640 }}>
+          <span style={{ fontSize: 15 }}>💡</span>
+          <span style={{ fontSize: 13, color: D.tx3, lineHeight: 1.6 }}>
+            {t(
+              "HR use case: convert gross salary between currencies before making cross-border offers. Use FX Rates below to calculate equivalent local salaries.",
+              "HR 使用情境：跨境開 Offer 前換算毛薪。用下方匯率將美元底薪換算成當地幣別，確認 Offer 金額對當地候選人的實際感受。"
+            )}
+          </span>
+        </div>
+      </div>
+
       {/* ── Guide cards ── */}
       <div style={{ display: "grid", gridTemplateColumns: "repeat(4,1fr)", gap: 14, marginBottom: 36 }}>
         {guides.map((g, i) => (
